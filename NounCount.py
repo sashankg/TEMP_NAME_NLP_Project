@@ -7,10 +7,14 @@ import sys
 def countNouns(sentence):
     tokens = nltk.word_tokenize(sentence)
     tagged = nltk.pos_tag(tokens)
-    tags = ['NN', 'NNS', 'NNP', 'NNPS', 'PRP', 'WP', 'WP$']
-    #print(tagged)
+    tags = ['PRP', 'PRP$', 'WP', 'WP$', 'NN', 'NNS', 'NNP', 'NNPS']
+    #print(tags)
+    #print('WP' in tags)
+    #print([x[1] for x in tagged])
+
+    #filter out the words with noun tags
     nounList = list(filter(lambda x: x[1] in tags, tagged))
-    print(nounList)
+    #print(nounList)
     return len(nounList)
 
 def main():
