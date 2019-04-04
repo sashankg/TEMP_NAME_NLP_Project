@@ -22,8 +22,8 @@ def getSentences(path):
     return [sent.string.strip() for sent in doc.sents]
 
 sentences = ["We all felt like we ate too much.", "The cat is eating the cake.", "She likes the chocolate cake.", "I should sleep.", "She ran faster than me."]
-sentences += getSentences('set1/a1.txt')
-sentences += getSentences('set1/a2.txt')
+sentences += getSentences('training_data/set1/a1.txt')
+sentences += getSentences('training_data/set1/a2.txt')
 questions = []
 lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 

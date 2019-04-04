@@ -56,7 +56,7 @@ def findBy(const_tree, vbphr):
 def is_how(const_tree):
 #returns is_how, obj, how
     cpy = const_tree.copy(deep=True)
-    badadv = ['almost', 'already', 'also', 'basically', 'further', 'finally', 'generally', 'greatly','however', 'initially', 'just', 'later', 'longer', 'meanwhile', 'often', 'only', 'now', 'then', 'typically']
+    badadv = ['all', 'almost', 'already', 'also', 'basically', 'further', 'finally', 'generally', 'greatly','however', 'initially', 'just', 'later', 'longer', 'meanwhile', 'often', 'only', 'perhaps', 'now', 'then', 'typically']
     #try by
     vbphr = getVP(const_tree, len(const_tree))
     (thing, bydoing) = findBy(const_tree, vbphr)
