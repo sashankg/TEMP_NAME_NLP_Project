@@ -100,19 +100,19 @@ def when(const_tree, nertags): #TODO identify pairs of dates and determine how t
         return 'When ' + q[:1].lower() + q[1:]
     else:
         return None
-
-for sent in sentences:
-    try:
-        const_tree1 = list(parser.raw_parse(sent))[0][0]
-        const_tree2 = const_tree1.copy(deep=True)
-    except:
-        #print('Exception at: ' + str(sent))
-        continue
-    nertags = parser.tag(sent.split())
-    whereQ = where(const_tree1, nertags)
-    whenQ = when(const_tree2, nertags)
-    if whereQ:
-        print(whereQ)
-    if whenQ:
-        print(whenQ)
+def test():
+    for sent in sentences:
+        try:
+            const_tree1 = list(parser.raw_parse(sent))[0][0]
+            const_tree2 = const_tree1.copy(deep=True)
+        except:
+            #print('Exception at: ' + str(sent))
+            continue
+        nertags = parser.tag(sent.split())
+        whereQ = where(const_tree1, nertags)
+        whenQ = when(const_tree2, nertags)
+        if whereQ:
+            print(whereQ)
+        if whenQ:
+            print(whenQ)
     
