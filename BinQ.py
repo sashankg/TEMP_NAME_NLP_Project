@@ -8,18 +8,23 @@ import sys
 parser = CoreNLPParser(url='http://localhost:9000')
 #for simple sentences: subj + pred, NP + VP + .
 #figure out when sentence form is ^
-def readFile(path):
+def readFileLines(path):
     with open(path, 'r') as f:
-        return f.read()
+        return f.readlines()
 def writeFile(path, contents):
     with open(path, 'w') as f:
         f.write(contents)
+
 def getSentences(path):
-    text = readFile(path)
+    text = [x.strip() for x in readFileLines(path)]
     nlp = English()
     nlp.add_pipe(nlp.create_pipe('sentencizer'))
-    doc = nlp(text)
-    return [sent.string.strip() for sent in doc.sents]
+    sentences = []
+    for txtline in text:
+        if len(txtline) < 30:
+            continue
+        sentences += [str(sent) for sent in nlp(txtline).sents]
+    return sentences
 
 sentences = ["We all felt like we ate too much.", "The cat is eating the cake.", "She likes the chocolate cake.", "I should sleep.", "She ran faster than me."]
 sentences += getSentences('training_data/set1/a1.txt')
@@ -65,9 +70,18 @@ def getDoForm(verb):
     elif verb.label().endswith('D'):
         ret += 'Did'  
     return ret
+
 def getVP(const_tree, tree_len):
     i = 1
     while i < tree_len and const_tree[i].label() != 'VP':
+        i += 1
+    if (i >= tree_len):
+        return None
+    return const_tree[i]
+
+def getNP(const_tree, tree_len):
+    i = 0
+    while i < tree_len and const_tree[i].label() != 'NP':
         i += 1
     if (i >= tree_len):
         return None
