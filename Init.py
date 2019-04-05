@@ -9,7 +9,7 @@ import sys
 import spacy
 from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
-
+from What import what
 
 parser = CoreNLPParser(url='http://localhost:9000')
 
@@ -85,6 +85,7 @@ def test():
         if howQ:
             howQs.append(howQ)
             print(howQ)
+        print(what(sent))
     questions = []
 
 test()
