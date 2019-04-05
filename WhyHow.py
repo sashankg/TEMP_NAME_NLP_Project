@@ -1,8 +1,7 @@
 import nltk
 import spacy
 import sys
-from BinQ import getVP, parser, getBinQ, leftmost, sentences
-
+from BinQ import getVP, getBinQ, leftmost
 #frequency
 #number
 
@@ -10,7 +9,7 @@ def vb_past(label):
   return label in ['VBD', 'VBN']
 
 """TODO: how often/frequency thing, freq; Number(thing, how many), Equivalence(thing1, thing2)"""
-sentences += ['The bus drove slowly', 'She ran away sneakily by tiptoeing her way out.', 'She is happy because she passed her test.']
+#sentences += ['The bus drove slowly', 'She ran away sneakily by tiptoeing her way out.', 'She is happy because she passed her test.']
 #sentences = ['His son, a person, might have created succession struggles', 'Sneferu was succeeded by his son, Khufu, who built the Great Pyramid of Giza']
 
 #for s in sentences:
@@ -103,21 +102,3 @@ def why(const_tree):
         q = "Why " + q[:1].lower() + q[1:]
         return q
     return None
-def test():
-    for s in sentences:
-        try: 
-            const_tree = list(parser.raw_parse(s))
-        except:
-            continue
-        if const_tree[0][0]:
-            const_tree = const_tree[0][0]
-            q1 = why(const_tree)
-            q2 = how(const_tree)
-            if (q1) and len(q1) < 200:
-                print(q1)
-            if(q2) and len(q2) < 200:
-                print(q2)
-            #q = getBinQ(const_tree)
-            #if q and len(q) < 200:
-            #    print(q)
-test()

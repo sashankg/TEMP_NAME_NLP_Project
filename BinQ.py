@@ -1,36 +1,10 @@
 import nltk
-from nltk.parse import CoreNLPParser
+#from nltk.parse import CoreNLPParser
 from nltk.tree import Tree
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
+#from spacy.lemmatizer import Lemmatizer
+#from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
+from Init import lem
 import sys
-
-parser = CoreNLPParser(url='http://localhost:9000')
-#for simple sentences: subj + pred, NP + VP + .
-#figure out when sentence form is ^
-def readFileLines(path):
-    with open(path, 'r') as f:
-        return f.readlines()
-def writeFile(path, contents):
-    with open(path, 'w') as f:
-        f.write(contents)
-
-def getSentences(path):
-    text = [x.strip() for x in readFileLines(path)]
-    nlp = English()
-    nlp.add_pipe(nlp.create_pipe('sentencizer'))
-    sentences = []
-    for txtline in text:
-        if len(txtline) < 30:
-            continue
-        sentences += [str(sent) for sent in nlp(txtline).sents]
-    return sentences
-
-sentences = ["We all felt like we ate too much.", "The cat is eating the cake.", "She likes the chocolate cake.", "I should sleep.", "She ran faster than me."]
-sentences += getSentences('training_data/set1/a1.txt')
-sentences += getSentences('training_data/set1/a2.txt')
-questions = []
-lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 #TODO: some capitalization errors welp
 def leftmost(phr):
@@ -124,12 +98,3 @@ def getBinQ(const_tree):
         ques = doform + beg + ques + '?'
         return (ques)
 
-def askAllBinQs(sentences):
-    for sent in sentences:
-        const_tree = list(parser.raw_parse(sent))
-        if const_tree[0][0]:
-            q = getBinQ(const_tree[0][0])
-            if q and len(q) < 200:
-                print(q)
-            else:
-                continue

@@ -1,7 +1,7 @@
 import nltk
 import spacy
 import sys
-from BinQ import getVP, getNP, parser, getBinQ, leftmost, sentences
+from BinQ import getVP, getNP, getBinQ, leftmost
 
 def is_who(const_tree):
 	cpy = const_tree.copy(deep=True)
@@ -32,18 +32,3 @@ def who(const_tree):
 			q =  "Who" + vp + "?"
 			return q
 	return None
-
-def test():
-	#sentences = ["Rami Eid is studying at Stony Brook University in NY"]
-	for s in sentences:
-		try: 
-			const_tree = list(parser.raw_parse(s))
-		except:
-			continue
-		if const_tree[0][0]:
-			const_tree = const_tree[0][0]
-			q = who(const_tree)
-			if q:
-				print(q)
-
-test()
