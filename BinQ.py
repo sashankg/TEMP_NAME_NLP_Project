@@ -14,12 +14,17 @@ def readFile(path):
 def writeFile(path, contents):
     with open(path, 'w') as f:
         f.write(contents)
+
 def getSentences(path):
-    text = readFile(path)
+    text = [x.strip() for x in readFileLines(path)]
     nlp = English()
     nlp.add_pipe(nlp.create_pipe('sentencizer'))
-    doc = nlp(text)
-    return [sent.string.strip() for sent in doc.sents]
+    sentences = []
+    for txtline in text:
+        if len(txtline) < 30:
+            continue
+        sentences += [str(sent) for sent in nlp(txtline).sents]
+    return sentences
 
 sentences = ["We all felt like we ate too much.", "The cat is eating the cake.", "She likes the chocolate cake.", "I should sleep.", "She ran faster than me."]
 sentences += getSentences('training_data/set1/a1.txt')
