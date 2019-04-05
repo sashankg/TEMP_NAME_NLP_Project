@@ -1,17 +1,17 @@
 import nltk
 from nltk.parse import CoreNLPParser
 from nltk.tree import Tree
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
-from BinQ import* 
+from BinQ import getBinQ
 from LocTime import where, when
 from Who import who
 from WhyHow import why, how
 import sys
 import spacy
+from spacy.lemmatizer import Lemmatizer
+from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
+
 
 parser = CoreNLPParser(url='http://localhost:9000')
-lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 #for simple sentences: subj + pred, NP + VP + .
 #figure out when sentence form is ^
@@ -67,7 +67,7 @@ def test():
         binQs = []
         if (const_tree6[0][0]):
             binQ = getBinQ(const_tree6)
-            if binQ and len(q) < 200:
+            if binQ and len(binQ) < 200:
                 print(binQ)
                 binQs.append(binQs)
         if whereQ:

@@ -2,12 +2,8 @@ import nltk
 import spacy
 import sys
 from BinQ import getVP, getBinQ, leftmost
-#from Init import*
 
 #parser.tagtype = 'ner'
-
-#sentences += ['The White House is in Washington D.C.', 'My house is by the park', 'I have an appointment at noon']
-
 
 def searchPhrase(const_tree, phraseType):
     phrases = []
@@ -101,5 +97,3 @@ def when(const_tree, nertags): #TODO identify pairs of dates and determine how t
         return 'When ' + q[:1].lower() + q[1:]
     else:
         return None
-
-    

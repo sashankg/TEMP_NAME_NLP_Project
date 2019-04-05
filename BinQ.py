@@ -3,9 +3,11 @@ import nltk
 from nltk.tree import Tree
 #from spacy.lemmatizer import Lemmatizer
 #from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
-from Init import lem
 import sys
+from spacy.lemmatizer import Lemmatizer
+from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 
+lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 #TODO: some capitalization errors welp
 def leftmost(phr):
 #first word in tree to lower case unless proper noun
