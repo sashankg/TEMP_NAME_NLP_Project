@@ -5,7 +5,7 @@ from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 import sys
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 def is_tense(tag):
@@ -54,17 +54,15 @@ def what(sent):
                 if child.dep_ == "neg":
                     head = child.text + " " + head
                 if child.pos_ == "ADP" and child.dep_ == "agent":
-                    agent = True
-                    ag = child.text
+                    agent = child.text
                 if child.pos_ == "VERB" and (child.dep_ in ["aux", "auxpass"]):
                     aux = child.text;
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
-                    xcomp = True
                     if child.nbor(-1).dep_ == "aux":
-                        xc = child.nbor(-1).text + " " + child.text
+                        xcomp = child.nbor(-1).text + " " + child.text
                     else:
-                        xc = child.text
+                        xcomp = child.text
 
 
     for chunk in doc.noun_chunks:
