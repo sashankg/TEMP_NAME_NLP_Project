@@ -99,6 +99,7 @@ def why(const_tree):
     (happening,_) = reason_cause(const_tree)
     if happening:
         q = getBinQ(happening)
-        q = "Why " + q[:1].lower() + q[1:]
-        return q
+        if q:
+            q = "Why " + q[:1].lower() + q[1:]
+            return q
     return None
