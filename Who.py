@@ -18,7 +18,7 @@ def is_who(const_tree):
 	for c in noun.ents:
 		if (c.label_ == ("PERSON" or "NORP" or "ORG" or "GPE")):
 			who = c
-	return who
+	return str(who)
 
 def who(const_tree):
 	res = is_who(const_tree)
