@@ -46,10 +46,10 @@ def goodQs(l): #filter q by len
             bad.append(q)
     return good, bad
 
-def main():
+def main(path, n):
     sentences = []
-    sentences += getSentences(sys.argv[1])
-    nquestions = int(sys.argv[2])
+    sentences += getSentences(path)
+    nquestions = n
     whereQs = []
     whenQs = []
     whoQs = []
@@ -147,4 +147,4 @@ def main():
         print(q)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1], sys.argv[2])

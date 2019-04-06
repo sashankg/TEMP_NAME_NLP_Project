@@ -120,10 +120,10 @@ def chunks(l, n):
     chunk_size = len(l) // n
     return [[l[i:i + chunk_size]] for i in range(0, len(l), chunk_size)]
 
-def main():
+def main(path, n):
     sentences = []
-    sentences += getSentences(sys.argv[1])
-    nquestions = int(sys.argv[2])
+    sentences += getSentences(path)
+    nquestions = n
     if len(sentences) <= NUM_PROCESSES * PROCESSOR_RATIO:
         results = getQs(sentences, nquestions)
 
@@ -183,4 +183,4 @@ def main():
         print(q)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1], int(sys.argv[2]))
