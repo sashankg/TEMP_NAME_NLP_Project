@@ -7,7 +7,7 @@ import sys
 doc_filename = sys.argv[1]
 question = sys.argv[2]
 
-doc_file = open(doc_filename, 'r')
+doc_file = open(doc_filename, 'r', encoding="utf-8")
 
 doc = doc_file.read()
 
