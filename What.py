@@ -9,19 +9,13 @@ nlp = spacy.load("en_core_web_sm")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 def is_tense(tag):
-    return tag in ['VBD', 'VBZ', 'VBP']
+    return tag in ['VBD', 'VBZ', 'VBP', 'VBN']
 
 def is_plural(tag):
   return tag.endswith('S')
 
 def is_verb(tag):
   return tag.startswith('V') or label == 'MD'
-
-def is_noun(tag):
-  return tag.startswith('NN')
-
-def is_adjective(tag):
-  return tag.startswith('JJ')
 
 def connect_conj(chunk):
     fin = chunk.text
@@ -44,17 +38,17 @@ def what(sent):
     head = ""
     aux = ""
     chunk_text = ""
-    ag = ""
-    xc = ""
+    agent = ""
+    xcomp = ""
+    past = False
     lefts = []
-    past = False;
-    agent = False;
-    xcomp = False
 
     for token in doc:
         if token.dep_ == "ROOT":
             head = get_base(token)
-            past = is_tense(token.pos_)
+            if token.nbor(1).dep_ == "prep":
+                head += (" " + token.nbor(1).text)
+            past = is_tense(token.tag_)
             lefts= [t.text for t in token.lefts]
             for child in token.lefts:
                 if child.dep_ == "neg":
@@ -81,19 +75,21 @@ def what(sent):
     if head in ["is", "was", "are"]:
         final_question = "What "+head+" "+chunk_text.strip()
         if xcomp:
-            final_question += (" " + xc)
-
+            final_question += (" " + xcomp)
 
     else:
         final_question = "What "
-        if aux != "":
+        if aux:
             final_question += (aux + " ")
         else:
-            final_question += ("do ")
+            if past:
+                final_question += ("did ")
+            else:
+                final_question += ("do ")
         final_question += (chunk_text.strip() + " " + head)
         if agent:
-            final_question += (" " + ag)
+            final_question += (" " + agent)
         if xcomp:
-            final_question += (" " + xc)
+            final_question += (" " + xcomp)
         final_question += "?"
     return (final_question)
