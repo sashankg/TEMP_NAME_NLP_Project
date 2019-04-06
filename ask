@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import InitFaster
 
 if len(sys.argv) < 3:
     raise Exception('Too few arguments')
@@ -10,7 +11,9 @@ article = open(article_filename, 'r')
 n_questions = int(sys.argv[2])
 
 # dummy questions
-questions = ["Who am I?" for i in range(0, n_questions)]
+# questions = [InitFaster.main() for i in range(0, n_questions)]
+# 
+# for q in questions:
+#     print(q)
 
-for q in questions:
-    print(q)
+InitFaster.main(article_filename, n_questions)
