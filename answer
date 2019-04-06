@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 import sys
+import matching
 
 if len(sys.argv) < 3:
     raise Exception('Too few arguments')
 
 article_filename = sys.argv[1]
-article = open(article_filename, 'r')
+article = open(article_filename, 'r', encoding="utf-8")
 
 questions_filename = sys.argv[2]
-questions = open(questions_filename, 'r')
+questions = open(questions_filename, 'r', encoding="utf-8")
 
 # dummy answers
-answers = ["I am me." for q in questions]
+doc = article.read()
+answers = [matching.matching_sentence(doc, q) for q in questions]
 
 for a in answers:
     print(a)

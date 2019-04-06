@@ -4,26 +4,38 @@ from fuzzywuzzy import fuzz
 import sys
 
 
-doc_filename = sys.argv[1]
-question = sys.argv[2]
+def main():
+    doc_filename = sys.argv[1]
+    question = sys.argv[2]
 
-doc_file = open(doc_filename, 'r', encoding="utf-8")
+    doc_file = open(doc_filename, 'r', encoding="utf-8")
 
-doc = doc_file.read()
+    doc = doc_file.read()
 
-sentences = nltk.sent_tokenize(doc)
+    sentences = nltk.sent_tokenize(doc)
 
-max_ratio = 0
-closest_sentence = ""
+    max_ratio = 0
+    closest_sentence = ""
 
-stemmer = PorterStemmer()
+    stemmer = PorterStemmer()
 
-for s in sentences:
-    r = fuzz.ratio(s, question)
-    if r > max_ratio:
-        max_ratio = r
-        closest_sentence = s
+    for s in sentences:
+        r = fuzz.ratio(s, question)
+        if r > max_ratio:
+            max_ratio = r
+            closest_sentence = s
 
-print(question)
+    print(question)
 
-print(closest_sentence)
+    print(closest_sentence)
+
+def matching_sentence(document, question):
+    sentences = nltk.sent_tokenize(document)
+    max_ratio = 0
+    closest_sentence = ""
+    for s in sentences:
+        r = fuzz.ratio(s, question)
+        if r > max_ratio:
+            max_ratio = r
+            closest_sentence = s
+    return closest_sentence
