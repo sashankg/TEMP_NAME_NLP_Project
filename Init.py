@@ -33,11 +33,37 @@ def getSentences(path):
         sentences += [str(sent) for sent in nlp(txtline).sents]
     return sentences
 
-def test():
+def goodQs(l): #filter q by len
+    if not l:
+        return [],[]
+    good = []
+    bad = []
+    for q in l:
+        qlen = len(q.split())
+        if (5 < qlen < 25):
+            good.append(q)
+        else:
+            bad.append(q)
+    return good, bad
+
+def main():
     sentences = []
-    sentences += getSentences('training_data/set1/a1.txt')
-    sentences += getSentences('training_data/set1/a2.txt')
+    sentences += getSentences(sys.argv[1])
+    nquestions = int(sys.argv[2])
+    whereQs = []
+    whenQs = []
+    whoQs = []
+    whyQs = []
+    howQs = []
+    binQs = []
+    whatQs = []
+    spacy_nlp = spacy.load('en')
+    stop = ['Bibliography', 'References', 'See also']
+    parser.tagtype = 'ner'
+
     for sent in sentences:
+        if sent.strip() in stop:
+            break
         try:
             const_tree1 = list(parser.raw_parse(sent))[0][0]
             const_tree2 = const_tree1.copy(deep=True)
@@ -48,44 +74,77 @@ def test():
         except:
             #print('Exception at: ' + str(sent))
             continue
-        nertags = []
-        spacy_nlp = spacy.load('en')
-        s1 = spacy_nlp(sent) 
-        for w in s1.ents:
-            nertags.append(w.label_)
+        try:
+            nertags = parser.tag(sent.split())
+        except:
+            nertags = []
+            s1 = spacy_nlp(sent) 
+            for w in s1:
+                nertags.append((str(w), w.ent_type_))
+            
         whereQ = where(const_tree1, nertags)
         whenQ = when(const_tree2, nertags)
         whoQ = who(const_tree3)
         whyQ = why(const_tree4)
         howQ = how(const_tree5)
+        whatQ = what(sent)
         binQ = None
-        whereQs = []
-        whenQs = []
-        whoQs = []
-        whyQs = []
-        howQs = []
-        binQs = []
+        
         if (const_tree6[0][0]):
             binQ = getBinQ(const_tree6)
             if binQ and len(binQ) < 200:
-                print(binQ)
-                binQs.append(binQs)
+                binQs.append(binQ)
+                #print(binQ)
         if whereQ:
             whereQs.append(whereQ)
-            print(whereQ)
+            #print(whereQ)
         if whenQ:
             whenQs.append(whenQ)
-            print(whenQ)
+            #print(whenQ)
         if whoQ:
             whoQs.append(whoQ)
-            print(whoQ)
+            #print(whoQ)
         if whyQ:
             whyQs.append(whyQ)
-            print(whyQ)
+            #print(whyQ)
         if howQ:
             howQs.append(howQ)
-            print(howQ)
-        print(what(sent))
-    questions = []
+            #print(howQ)
+        if (len(whatQ.split()) > 3): #filter potentially bad qs
+            whatQs.append(whatQ)
+    final_qs = []
+    goodWho, b1 = goodQs((whoQs))
+    goodWhere, b2 = goodQs((whereQs))
+    goodWhen, b3 = goodQs((whenQs))
+    goodWhy, b4 = goodQs((whyQs))
+    goodWhat, b5 = goodQs((whatQs))
+    goodHow, b6 = goodQs((howQs))
+    goodBi, b7 = goodQs((binQs))
+    bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5] #who, what, where, when, why, how
+    while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) > 0:
+        if len(final_qs) > nquestions:
+            break
+        if goodWho:
+            final_qs.append(goodWho.pop(0))
+        if goodWhere:
+            final_qs.append(goodWhere.pop(0))
+        if goodWhen:
+            final_qs.append(goodWhen.pop(0))
+        if goodWhy:
+            final_qs.append(goodWhy.pop(0))
+        if goodWhat:
+            final_qs.append(goodWhat.pop(0))
+        if goodHow:
+            final_qs.append(goodHow.pop(0))
+        if goodBi:
+            final_qs.append(goodBi.pop(0))
+    for b in bads:
+        if len(final_qs) < nquestions:
+            final_qs += b
+    while(len(final_qs) < nquestions):
+        final_qs.append('Is this a question?')
+    for q in final_qs[0:nquestions]:
+        print(q)
 
-test()
+if __name__ == "__main__":
+    main()

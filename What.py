@@ -74,8 +74,6 @@ def what(sent):
 
 
     for chunk in doc.noun_chunks:
-        print(chunk.text + " is a " + chunk.root.dep_)
-        #print(chunk.root.conjuncts)
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
             and chunk.root.text != "it" and chunk.root.text in lefts):
             chunk_text = connect_conj(chunk)
@@ -84,7 +82,6 @@ def what(sent):
         final_question = "What "+head+" "+chunk_text.strip()
         if xcomp:
             final_question += (" " + xc)
-        print(final_question+"?")
 
 
     else:
