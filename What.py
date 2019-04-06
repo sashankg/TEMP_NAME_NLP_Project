@@ -46,8 +46,11 @@ def what(sent):
     for token in doc:
         if token.dep_ == "ROOT":
             head = get_base(token)
-            if token.nbor(1).dep_ == "prep":
-                head += (" " + token.nbor(1).text)
+            try:
+                if token.nbor(1).dep_ == "prep":
+                    head += (" " + token.nbor(1).text)
+            except:
+                pass
             past = is_tense(token.tag_)
             lefts= [t.text for t in token.lefts]
             for child in token.lefts:
