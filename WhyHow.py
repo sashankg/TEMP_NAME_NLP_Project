@@ -72,7 +72,7 @@ def is_how(const_tree):
 #generate how question
 def how(const_tree):
     res = is_how(const_tree)
-    if res:
+    if not (res == (None, None)):
       q = getBinQ(res[0])
       if q != None:
         q = "How " +  q[:1].lower() + q[1:]
