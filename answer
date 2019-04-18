@@ -14,7 +14,8 @@ questions = open(questions_filename, 'r', encoding="utf-8")
 questions1 = open(questions_filename, 'r', encoding="utf-8")
 
 # dummy answers
-doc = article.read()
-matches = [matching.matching_sentence(doc, q) for q in questions]
+#doc = article.read()
+matches = [matching.matching_sentence(article_filename, q) for q in questions]
 
 InitAnswers.main(questions1.readlines(), matches)
+

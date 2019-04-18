@@ -2,7 +2,7 @@ from nltk.stem.porter import *
 import nltk
 from fuzzywuzzy import fuzz
 import sys
-
+from Init import getSentences
 
 def main():
     doc_filename = sys.argv[1]
@@ -30,7 +30,8 @@ def main():
     print(closest_sentence)
 
 def matching_sentence(document, question):
-    sentences = nltk.sent_tokenize(document)
+    sentences = getSentences(document)
+    #sentences = nltk.sent_tokenize(document)
     max_ratio = 0
     closest_sentence = ""
     for s in sentences:
