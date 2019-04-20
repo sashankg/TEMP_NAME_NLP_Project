@@ -1,5 +1,6 @@
 import nltk
 from nltk.parse import CoreNLPParser
+from stanfordcorenlp import StanfordCoreNLP
 from nltk.tree import Tree
 from BinQ import getBinQ
 from LocTime import where, when
@@ -11,7 +12,7 @@ from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 from What import what
 
-parser = CoreNLPParser(url='http://localhost:9000')
+parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 
 #for simple sentences: subj + pred, NP + VP + .
 #figure out when sentence form is ^
@@ -59,36 +60,66 @@ def main(path, n):
     whatQs = []
     spacy_nlp = spacy.load('en')
     stop = ['Bibliography', 'References', 'See also']
-    parser.tagtype = 'ner'
+    #parser.tagtype = 'ner'
 
     for sent in sentences:
         if sent.strip() in stop:
             break
         try:
-            const_tree1 = list(parser.raw_parse(sent))[0][0]
+            const_tree1 = Tree.fromstring(parser.parse(sent))[0]
             const_tree2 = const_tree1.copy(deep=True)
             const_tree3 = const_tree1.copy(deep=True)
             const_tree4 = const_tree1.copy(deep=True)
             const_tree5 = const_tree1.copy(deep=True)
             const_tree6 = const_tree1.copy(deep=True)
-        except:
+        except Exception as e:
             #print('Exception at: ' + str(sent))
             continue
         try:
-            nertags = parser.tag(sent.split())
-        except:
+            nertags = parser.ner(sent)
+        except Exception as e:
+            print(e)
             nertags = []
             s1 = spacy_nlp(sent) 
             for w in s1:
                 nertags.append((str(w), w.ent_type_))
+
+        #whereQ = where(const_tree1, nertags)
+        #whenQ = when(const_tree2, nertags)
+        #whoQ = who(const_tree3)
+        #whyQ = why(const_tree4)
+        #howQ = how(const_tree5)
+        #whatQ = what(sent)
+        #binQ = None
             
-        whereQ = where(const_tree1, nertags)
-        whenQ = when(const_tree2, nertags)
-        whoQ = who(const_tree3)
-        whyQ = why(const_tree4)
-        howQ = how(const_tree5)
-        whatQ = what(sent)
-        binQ = None
+        try:
+            whereQ = where(const_tree1, nertags)
+        except:
+            continue
+        try:
+            whenQ = when(const_tree2, nertags)
+        except:
+            continue
+        try:
+            whoQ = who(const_tree3)
+        except:
+            continue
+        try:
+            whyQ = why(const_tree4)
+        except:
+            continue
+        try:
+            howQ = how(const_tree5)
+        except:
+            continue
+        try:
+            whatQ = what(sent)
+        except:
+            continue
+        try:
+            binQ = None
+        except:
+            continue
         
         if (const_tree6[0][0]):
             binQ = getBinQ(const_tree6)
@@ -145,6 +176,9 @@ def main(path, n):
         final_qs.append('Is this a question?')
     for q in final_qs[0:nquestions]:
         print(q)
+    parser.close()
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    #main(sys.argv[1], int(sys.argv[2]))
+    for i in range(int(sys.argv[2])):
+        print("Who is Cleopatra?")
