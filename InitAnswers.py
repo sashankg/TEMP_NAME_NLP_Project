@@ -12,6 +12,7 @@ from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 import sys
 import matching
+from SynAnt import answerBinQ
 
 parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
@@ -55,8 +56,7 @@ def main(questions, matches):
 		elif (keyword == "Why"):
 			(t4, whyA) = reason_cause(const_tree4)
 		elif (keywordpos == "MD" or lem(u''+keyword, u'VERB')[0] == "do" or lem(u''+keyword, u'VERB')[0] == "is" or lem(u''+keyword, u'VERB')[0] == "be"):
-			binA = getBinQ(const_tree6)
-			print("Yes")
+			print(answerBinQ(sent, questions[i], spacy_nlp))
 		else:
 			print("NONE")
 
