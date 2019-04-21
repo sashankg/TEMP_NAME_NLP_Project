@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import InitFaster
+import Init
 
 if len(sys.argv) < 3:
     raise Exception('Too few arguments')

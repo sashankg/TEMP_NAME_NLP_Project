@@ -83,7 +83,7 @@ def is_time(const_tree, nertags, answering):
                         return const_tree, phr
     if answering:
         res = ''
-        for n in nertag:
+        for n in nertags:
             if n[1] in timetags:
                 res += n[0] + ' '
             if len(res) > 0 and n[1] not in timetags:

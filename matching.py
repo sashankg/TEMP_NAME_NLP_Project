@@ -5,8 +5,6 @@ import sys
 import spacy 
 from spacy.lemmatizer import Lemmatizer
 
-nlp = spacy.load('en_core_wb_lg')
-
 def main():
     doc_filename = sys.argv[1]
     question = sys.argv[2]

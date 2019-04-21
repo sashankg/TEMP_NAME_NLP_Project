@@ -60,19 +60,19 @@ def is_how(const_tree):
     vbphr = getVP(const_tree, len(const_tree))
     (thing, bydoing) = findBy(const_tree, vbphr)
     if thing != None:
-        return thing, bydoing
+        return thing, " ".join(bydoing.leaves())
     else:
     #try adv
         (thing, how) = findAdv(cpy, getVP(cpy, len(cpy)))
         if thing == None or leftmost(how)[0].lower() in badadv:
-            return None
+            return None, None
         else:
-            return cpy, how
+            return cpy, " ".join(how.leaves())
 
 #generate how question
 def how(const_tree):
     res = is_how(const_tree)
-    if res:
+    if not (res == (None, None)):
       q = getBinQ(res[0])
       if q != None:
         q = "How " +  q[:1].lower() + q[1:]
