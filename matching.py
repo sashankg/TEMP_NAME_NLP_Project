@@ -18,9 +18,6 @@ def main():
 
 
 def matching_sentence(document, question):
-    q = nlp(question)
-    keywords = [x for x in q if not x.is_stop]
-    print(keywords)
     sentences = nltk.sent_tokenize(document)
     max_ratio = 0
     closest_sentence = ""
