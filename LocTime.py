@@ -67,7 +67,7 @@ def is_time(const_tree, nertags, answering):
             for n in nertags:
                 if n[1] in timetags and np[0] == (n[0]):
                     const_tree.remove(phr)
-                    return const_tree, phr
+                    return const_tree, " ".join(phr.leaves())
     if vp:
         for phr in vp:
             #TODO should be more robust but works for now
@@ -80,7 +80,7 @@ def is_time(const_tree, nertags, answering):
                 for n in nertags:
                     if n[1] in timetags and np[0] == (n[0]):
                         vp.remove(phr)
-                        return const_tree, phr
+                        return const_tree, " ".join(phr.leaves())
     if answering:
         res = ''
         for n in nertags:
