@@ -34,29 +34,35 @@ def main(questions, matches):
 		except Exception as e:
                     continue
 		try:
-                    nertags = parser.ner(sent)
+			nertags = parser.ner(sent)
 		except:
-                    nertags = []
-                    s1 = spacy_nlp(sent) 
-                    for w in s1:
-                        nertags.append((str(w), w.ent_type_))
-
-		if (keyword == "Where"): 
-			(t1, whereA) = is_where(const_tree1, nertags, True)
+			nertags = []
+			s1 = spacy_nlp(sent) 
+			for w in s1:
+				nertags.append((str(w), w.ent_type_))
+		(t1, whereA) = is_where(const_tree1, nertags, True)
+		if (keyword == "Where" and whereA != None): 
 			print(whereA)
-		elif (keyword == "When"):
-			(t2, whenA) = is_time(const_tree2, nertags, True)
+			continue
+		(t2, whenA) = is_time(const_tree2, nertags, True)
+		if (keyword == "When" and whenA != None):
 			print(whenA)
-		elif (keyword == "Who"):
-			whoA = is_who(const_tree3)
+			continue
+		whoA = is_who(const_tree3)
+		if (keyword == "Who" and whoA != None):
 			print(whoA)
-		elif (keyword == "How"):
-			(t5, howA) = is_how(const_tree5)
+			continue
+		(t5, howA) = is_how(const_tree5)
+		if (keyword == "How" and howA != None):
 			print(howA)
-		elif (keyword == "Why"):
-			(t4, whyA) = reason_cause(const_tree4)
-		elif (keywordpos == "MD" or lem(u''+keyword, u'VERB')[0] == "do" or lem(u''+keyword, u'VERB')[0] == "is" or lem(u''+keyword, u'VERB')[0] == "be"):
+			continue
+		(t4, whyA) = reason_cause(const_tree4)
+		if (keyword == "Why" and whyA != None):
+			print(whyA)
+			continue
+		if (keywordpos == "MD" or lem(u''+keyword, u'VERB')[0] == "do" or lem(u''+keyword, u'VERB')[0] == "is" or lem(u''+keyword, u'VERB')[0] == "be"):
 			print(answerBinQ(sent, questions[i], spacy_nlp))
+			continue
 		else:
 			print(sent)
 
