@@ -58,7 +58,7 @@ def main(questions, matches):
 		elif (keywordpos == "MD" or lem(u''+keyword, u'VERB')[0] == "do" or lem(u''+keyword, u'VERB')[0] == "is" or lem(u''+keyword, u'VERB')[0] == "be"):
 			print(answerBinQ(sent, questions[i], spacy_nlp))
 		else:
-			print("NONE")
+			print(sent)
 
 
 if __name__ == "__main__":

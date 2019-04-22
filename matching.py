@@ -4,6 +4,7 @@ from fuzzywuzzy import fuzz
 import sys
 import spacy 
 from spacy.lemmatizer import Lemmatizer
+from InitFaster import getSentences
 
 def main():
     doc_filename = sys.argv[1]
@@ -18,7 +19,7 @@ def main():
 
 
 def matching_sentence(document, question):
-    sentences = nltk.sent_tokenize(document)
+    sentences = getSentences(document)
     max_ratio = 0
     closest_sentence = ""
     for s in sentences:

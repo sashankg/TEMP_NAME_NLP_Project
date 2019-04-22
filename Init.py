@@ -143,7 +143,8 @@ def main(path, n):
             howQs.append(howQ)
             #print(howQ)
         if (len(whatQ.split()) > 3): #filter potentially bad qs
-            whatQs.append(whatQ)
+            if not (whereQ or whenQ or whoQ):
+                whatQs.append(whatQ)
     final_qs = []
     goodWho, b1 = goodQs((whoQs))
     goodWhere, b2 = goodQs((whereQs))

@@ -143,7 +143,8 @@ def getQs(sentences):
             howQs.append(howQ)
             #print(howQ)
         if (len(whatQ.split()) > 3): #filter potentially bad qs
-            whatQs.append(whatQ)
+            if not (whereQ or whenQ or whoQ):
+                whatQs.append(whatQ)
     return whereQs, whenQs, whoQs, whyQs, howQs, binQs, whatQs
     
 
