@@ -2,11 +2,31 @@ import os
 import spacy
 from spacy import displacy
 from spacy.lemmatizer import Lemmatizer
-from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
+from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 import sys
 
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
+
+"""
+def readFileLines(path):
+    with open(path, 'r') as f:
+        return f.readlines()
+def writeFile(path, contents):
+    with open(path, 'w') as f:
+        f.write(contents)
+
+def getSentences(path):
+    text = [x.strip() for x in readFileLines(path)]
+    nl = English()
+    nl.add_pipe(nlp.create_pipe('sentencizer'))
+    sentences = []
+    for txtline in text:
+        if len(txtline) < 30:
+            continue
+        sentences += [str(sent) for sent in nl(txtline).sents]
+    return sentences
+"""
 
 def is_tense(tag):
     return tag in ['VBD', 'VBZ', 'VBP', 'VBN']
@@ -18,13 +38,27 @@ def is_verb(tag):
   return tag.startswith('V') or label == 'MD'
 
 def connect_conj(chunk):
-    fin = chunk.text
+    fin = ""
+    if(chunk[0].tag_ not in  ["PROPN", "NNS"]):
+        fin += chunk[0].text.lower() + " "
+    else:
+        fin += chunk[0].text + " "
+    fin += chunk[1:].text
     conjs = chunk.conjuncts
     if(conjs):
         if(len(conjs) > 1):
             for word in conjs[0:len(conjs) - 1]:
                 fin += (", " + word.text)
         fin += (" and " + conjs[len(conjs) - 1].text)
+    return fin
+
+def get_prep(prep):
+    fin = prep.text.lower()
+    prep = prep.nbor(1)
+    while(prep.dep_ != "pobj"):
+        fin += " " + prep.text
+        prep = prep.nbor(1)
+    fin += " " + prep.text
     return fin
 
 def get_base(token):
@@ -40,6 +74,7 @@ def what(sent):
     chunk_text = ""
     agent = ""
     xcomp = ""
+    prep = ""
     past = False
     lefts = []
 
@@ -60,6 +95,9 @@ def what(sent):
                     agent = child.text
                 if child.pos_ == "VERB" and (child.dep_ in ["aux", "auxpass"]):
                     aux.append(child.text);
+                if child.dep_ == "prep":
+                    prep = get_prep(child)
+
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
                     if child.nbor(-1).dep_ == "aux":
@@ -67,42 +105,49 @@ def what(sent):
                     else:
                         xcomp = child.text
 
-
     for chunk in doc.noun_chunks:
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
             and chunk.root.text != "it" and chunk.root.text in lefts):
             chunk_text = connect_conj(chunk)
-            if chunk.root.nbor(1).dep_ == "prep":
-                ind = 1
-                temp = chunk.root.nbor(ind)
-                while(chunk.root.nbor(ind).dep_ != "pobj"):
-                    chunk_text += " " + chunk.root.nbor(ind).text
-                    ind += 1
-                chunk_text += " " + chunk.root.nbor(ind).text
 
 
-    if head in ["is", "was", "are"]:
+    if head in ["is", "was", "are"] and chunk_text != "":
         final_question = "What "+head+" "+chunk_text.strip()
         if xcomp:
             final_question += (" " + xcomp)
+        final_question += "?"
 
     else:
-        final_question = "What "
-        if len(aux) == 1:
-            final_question += (aux[0] + " ")
-            final_question += (chunk_text.strip() + " " + head)
-        elif len(aux) == 2:
-            final_question += (aux[0] + " ")
-            final_question += (chunk_text.strip() + " " + aux[1] + " " + head)
-        else:
-            if past:
-                final_question += ("did ")
+        final_question = ""
+        if(head != "" and chunk_text != ""):
+            final_question = "What "
+            if len(aux) == 1:
+                final_question += (aux[0] + " ")
+                final_question += (chunk_text.strip() + " " + head)
+            elif len(aux) == 2:
+                final_question += (aux[0] + " ")
+                final_question += (chunk_text.strip() + " " + aux[1] + " " + head)
             else:
-                final_question += ("do ")
-            final_question += (chunk_text.strip() + " " + head)
-        if agent:
-            final_question += (" " + agent)
-        if xcomp:
-            final_question += (" " + xcomp)
-        final_question += "?"
+                if past:
+                    final_question += ("did ")
+                else:
+                    final_question += ("do ")
+                final_question += (chunk_text.strip() + " " + head)
+            if agent:
+                final_question += (" " + agent)
+            if xcomp:
+                final_question += (" " + xcomp)
+            if prep:
+                final_question += (" " + prep)
+            final_question += "?"
     return (final_question)
+
+"""
+def main():
+    sents = getSentences("./training_data/set5/a5.txt")
+    for sent in sents:
+        print(what(sent))
+
+if __name__ == "__main__":
+    main()
+"""
