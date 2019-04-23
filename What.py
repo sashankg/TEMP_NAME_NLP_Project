@@ -36,7 +36,7 @@ def get_base(token):
 def what(sent):
     doc = nlp(sent)
     head = ""
-    aux = ""
+    aux = []
     chunk_text = ""
     agent = ""
     xcomp = ""
@@ -59,7 +59,7 @@ def what(sent):
                 if child.pos_ == "ADP" and child.dep_ == "agent":
                     agent = child.text
                 if child.pos_ == "VERB" and (child.dep_ in ["aux", "auxpass"]):
-                    aux = child.text;
+                    aux.append(child.text);
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
                     if child.nbor(-1).dep_ == "aux":
@@ -72,6 +72,14 @@ def what(sent):
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
             and chunk.root.text != "it" and chunk.root.text in lefts):
             chunk_text = connect_conj(chunk)
+            if chunk.root.nbor(1).dep_ == "prep":
+                ind = 1
+                temp = chunk.root.nbor(ind)
+                while(chunk.root.nbor(ind).dep_ != "pobj"):
+                    chunk_text += " " + chunk.root.nbor(ind).text
+                    ind += 1
+                chunk_text += " " + chunk.root.nbor(ind).text
+
 
     if head in ["is", "was", "are"]:
         final_question = "What "+head+" "+chunk_text.strip()
@@ -80,14 +88,18 @@ def what(sent):
 
     else:
         final_question = "What "
-        if aux:
-            final_question += (aux + " ")
+        if len(aux) == 1:
+            final_question += (aux[0] + " ")
+            final_question += (chunk_text.strip() + " " + head)
+        elif len(aux) == 2:
+            final_question += (aux[0] + " ")
+            final_question += (chunk_text.strip() + " " + aux[1] + " " + head)
         else:
             if past:
                 final_question += ("did ")
             else:
                 final_question += ("do ")
-        final_question += (chunk_text.strip() + " " + head)
+            final_question += (chunk_text.strip() + " " + head)
         if agent:
             final_question += (" " + agent)
         if xcomp:
