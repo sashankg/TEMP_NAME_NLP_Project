@@ -45,6 +45,8 @@ def getDoForm(verb):
         ret += 'Do'
     elif verb.label().endswith('D'):
         ret += 'Did'  
+    else:
+        ret += 'Did'
     return ret
 
 def getVP(const_tree, tree_len):
