@@ -55,10 +55,11 @@ def connect_conj(chunk):
 def get_prep(prep):
     fin = prep.text.lower()
     prep = prep.nbor(1)
-    while(prep.dep_ not in ["pobj", "dobj", "attr"]):
+    while(prep.dep_ not in ["pobj", "dobj", "attr", "punct"]):
         fin += " " + prep.text
         prep = prep.nbor(1)
-    fin += " " + prep.text
+    if(prep.dep != "punct"):
+        fin += " " + prep.text
     return fin
 
 def get_base(token):
@@ -75,6 +76,7 @@ def what(sent):
     agent = ""
     xcomp = ""
     prep = ""
+    obj = ""
     past = False
     lefts = []
 
@@ -85,7 +87,7 @@ def what(sent):
                 if token.nbor(1).dep_ == "prep":
                     head += (" " + token.nbor(1).text)
                 elif token.nbor(1).dep_ in ["dobj", "pobj", "attr"]:
-                    head += (" " + token.nbor(1).text)
+                    obj += token.nbor(1).text
             except:
                 pass
 
@@ -102,10 +104,14 @@ def what(sent):
 
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
-                    if child.nbor(-1).dep_ == "aux":
-                        xcomp = child.nbor(-1).text + " " + child.text
-                    else:
-                        xcomp = child.text
+                    for gchild in child.lefts:
+                        if gchild.dep_ == "aux":
+                            xcomp = gchild.text + " "
+                            break
+                    for gchild in child.rights:
+                        if gchild.dep_ == "prep":
+                            xcomp += gchild.text + " "
+                    xcomp += child.text
                 if child.pos_ == "ADP" and child.dep_ == "agent":
                     agent = child.text
                 if child.dep_ == "prep" and not first:
@@ -116,7 +122,6 @@ def what(sent):
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
             and chunk.root.text != "it" and chunk.root.text in lefts):
             chunk_text = connect_conj(chunk)
-
 
     if head in ["is", "was", "are"] and chunk_text != "":
         final_question = "What "+head+" "+chunk_text.strip()
@@ -140,6 +145,8 @@ def what(sent):
                 else:
                     final_question += ("do ")
                 final_question += (chunk_text.strip() + " " + head)
+            if obj:
+                final_question += (" " + obj)
             if agent:
                 final_question += (" " + agent)
             if xcomp:
@@ -154,7 +161,7 @@ def what(sent):
 
 """
 def main():
-    sents = getSentences("./training_data/set1/a3.txt")
+    sents = getSentences("./training_data/set2/a3.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
