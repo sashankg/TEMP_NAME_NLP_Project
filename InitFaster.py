@@ -11,6 +11,7 @@ import spacy
 from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 from What import what
+from SynAnt import addAnt
 import multiprocessing as mp
 
 NUM_PROCESSES = mp.cpu_count()     # Uses all cores available
@@ -124,7 +125,7 @@ def getQs(sentences):
         if (const_tree6[0][0]):
             binQ = getBinQ(const_tree6)
             if binQ and len(binQ) < 200:
-                binQs.append(binQ)
+                binQs.append(addAnt(binQ, spacy_nlp))
                 #print(binQ)
         if whereQ:
             whereQs.append(whereQ)
@@ -142,7 +143,8 @@ def getQs(sentences):
             howQs.append(howQ)
             #print(howQ)
         if (len(whatQ.split()) > 3): #filter potentially bad qs
-            whatQs.append(whatQ)
+            if not (whereQ or whenQ or whoQ):
+                whatQs.append(whatQ)
     return whereQs, whenQs, whoQs, whyQs, howQs, binQs, whatQs
     
 

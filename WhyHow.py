@@ -92,7 +92,7 @@ def reason_cause(const_tree):
             if phr.label() == 'SBAR' and leftmost(phr)[0] == 'because':
                 reason = phr
                 vp.remove(reason)
-                return const_tree, reason
+                return const_tree, " ".join(reason.leaves())
     return None, None
 
 def why(const_tree):
