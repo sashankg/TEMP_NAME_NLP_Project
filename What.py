@@ -8,7 +8,7 @@ import sys
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-"""
+
 def readFileLines(path):
     with open(path, 'r') as f:
         return f.readlines()
@@ -26,7 +26,6 @@ def getSentences(path):
             continue
         sentences += [str(sent) for sent in nl(txtline).sents]
     return sentences
-"""
 
 def is_tense(tag):
     return tag in ['VBD', 'VBZ', 'VBP', 'VBN']
@@ -55,7 +54,7 @@ def connect_conj(chunk):
 def get_prep(prep):
     fin = prep.text.lower()
     prep = prep.nbor(1)
-    while(prep.dep_ != "pobj"):
+    while(prep.dep_ not in ["pobj", "dobj", "attr"]):
         fin += " " + prep.text
         prep = prep.nbor(1)
     fin += " " + prep.text
@@ -84,15 +83,17 @@ def what(sent):
             try:
                 if token.nbor(1).dep_ == "prep":
                     head += (" " + token.nbor(1).text)
+                elif token.nbor(1).dep_ in ["dobj", "pobj", "attr"]:
+                    head += (" " + token.nbor(1).text)
             except:
                 pass
+
+            first = True
             past = is_tense(token.tag_)
             lefts= [t.text for t in token.lefts]
             for child in token.lefts:
                 if child.dep_ == "neg":
                     head = child.text + " " + head
-                if child.pos_ == "ADP" and child.dep_ == "agent":
-                    agent = child.text
                 if child.pos_ == "VERB" and (child.dep_ in ["aux", "auxpass"]):
                     aux.append(child.text);
                 if child.dep_ == "prep":
@@ -104,6 +105,11 @@ def what(sent):
                         xcomp = child.nbor(-1).text + " " + child.text
                     else:
                         xcomp = child.text
+                if child.pos_ == "ADP" and child.dep_ == "agent":
+                    agent = child.text
+                if child.dep_ == "prep" and not first:
+                    first = False
+                    head += (" " + child.text)
 
     for chunk in doc.noun_chunks:
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
@@ -140,14 +146,17 @@ def what(sent):
             if prep:
                 final_question += (" " + prep)
             final_question += "?"
+    if(final_question == ""):
+        return None
+
     return (final_question)
 
-"""
 def main():
-    sents = getSentences("./training_data/set5/a5.txt")
+    sents = getSentences("./training_data/set1/a3.txt")
     for sent in sents:
-        print(what(sent))
+        temp = what(sent)
+        if temp != None:
+            print(what(sent))
 
 if __name__ == "__main__":
     main()
-"""
