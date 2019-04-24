@@ -47,7 +47,6 @@ def main(questions, matches):
 		try:
 			nertags = parser.ner(sent)
 		except Exception as e:
-			print(e)
 			nertags = []
 			s1 = spacy_nlp(sent) 
 			for w in s1:
