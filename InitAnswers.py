@@ -17,10 +17,17 @@ from SynAnt import answerBinQ
 parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
+def rem_parens(sent):
+	return sent.replace('-LRB- ', '(').replace(' -RRB-', ')')
+
+def cap(sent):
+	return sent[0].upper() + sent[1:]
+
 def main(questions, matches):
 	spacy_nlp = spacy.load('en')
 	for i in range(len(matches)):
 		keyword = questions[i].split(" ")[0]
+		keyword_lower = keyword[0].lower() + keyword[1:]
 		#parser.tagtype = 'pos'
 		[(w, keywordpos)] = parser.pos_tag(keyword)
 		sent = matches[i]
@@ -42,29 +49,29 @@ def main(questions, matches):
 				nertags.append((str(w), w.ent_type_))
 		(t1, whereA) = is_where(const_tree1, nertags, True)
 		if (keyword == "Where" and whereA != None): 
-			print(whereA)
+			print(cap(rem_parens(whereA)))
 			continue
 		(t2, whenA) = is_time(const_tree2, nertags, True)
 		if (keyword == "When" and whenA != None):
-			print(whenA)
+			print(cap(rem_parens(whenA)))
 			continue
 		whoA = is_who(const_tree3)
 		if (keyword == "Who" and whoA != None):
-			print(whoA)
+			print(cap(rem_parens(whoA)))
 			continue
 		(t5, howA) = is_how(const_tree5)
 		if (keyword == "How" and howA != None):
-			print(howA)
+			print(cap(rem_parens(howA)))
 			continue
 		(t4, whyA) = reason_cause(const_tree4)
 		if (keyword == "Why" and whyA != None):
-			print(whyA)
+			print(cap(rem_parens(whyA)))
 			continue
-		if (keywordpos == "MD" or lem(u''+keyword, u'VERB')[0] == "do" or lem(u''+keyword, u'VERB')[0] == "is" or lem(u''+keyword, u'VERB')[0] == "be"):
-			print(answerBinQ(sent, questions[i], spacy_nlp))
+		if (keywordpos == "MD" or lem(u''+keyword_lower, u'VERB')[0] == "do" or lem(u''+keyword_lower, u'VERB')[0] == "is" or lem(u''+keyword_lower, u'VERB')[0] == "be"):
+			print(rem_parens(answerBinQ(sent, questions[i], spacy_nlp)))
 			continue
 		else:
-			print(sent)
+			print(rem_parens(sent))
 
 
 if __name__ == "__main__":

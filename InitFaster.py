@@ -60,11 +60,24 @@ def getQs(sentences):
     howQs = []
     binQs = []
     whatQs = []
+    whereQ = None
+    whenQ = None
+    whoQ = None
+    whyQ = None
+    howQ = None
+    binQ = None
+    whatQ = None
     spacy_nlp = spacy.load('en')
     stop = ['bibliography', 'references', 'see also']
-    #parser.tagtype = 'ner'
-
     for sent in sentences:
+        whereQ = None
+        whenQ = None
+        whoQ = None
+        whyQ = None
+        howQ = None
+        binQ = None
+        whatQ = None
+        question = None
         if sent.strip(' ').lower() in stop:
             break
         try:
@@ -77,56 +90,60 @@ def getQs(sentences):
         except:
             #print('Exception at: ' + str(sent))
             continue
-        try:
+        nertags = []
+        s1 = spacy_nlp(sent) 
+        for w in s1:
+            nertags.append((str(w), w.ent_type_))
+        '''try:
             nertags = parser.ner(sent)
         except:
             nertags = []
             s1 = spacy_nlp(sent) 
             for w in s1:
-                nertags.append((str(w), w.ent_type_))
-           
-        # whereQ = where(const_tree1, nertags)
-        # whenQ = when(const_tree2, nertags)
-        # whoQ = who(const_tree3)
-        # whyQ = why(const_tree4)
-        # howQ = how(const_tree5)
-        # whatQ = what(sent)
-        # binQ = None
-
-        try:
-            whereQ = where(const_tree1, nertags)
-        except:
-            continue
-        try:
-            whenQ = when(const_tree2, nertags)
-        except:
-            continue
-        try:
-            whoQ = who(const_tree3)
-        except:
-            continue
-        try:
-            whyQ = why(const_tree4)
-        except:
-            continue
-        try:
-            howQ = how(const_tree5)
-        except:
-            continue
-        try:
-            whatQ = what(sent)
-        except:
-            continue
-        try:
-            binQ = None
-        except:
-            continue
-        
-        if (const_tree6[0][0]):
-            binQ = getBinQ(const_tree6)
-            if binQ and len(binQ) < 200:
-                binQs.append(addAnt(binQ, spacy_nlp))
-                #print(binQ)
+                nertags.append((str(w), w.ent_type_))'''
+        if (question == None):
+            try:
+                whyQ = why(const_tree4)
+                question = whyQ
+            except:
+                continue
+        if (question == None):
+            try:
+                howQ = how(const_tree5)
+                question = howQ
+            except:
+                continue
+        if (question == None):
+            if (const_tree6[0][0]):
+                binQ = getBinQ(const_tree6)
+                question = binQ
+                if binQ and len(binQ) < 200:
+                    binQs.append(addAnt(binQ, spacy_nlp))
+                    #print(binQ)
+        if (question == None):
+            try:
+                whereQ = where(const_tree1, nertags)
+                question = whereQ
+            except:
+                continue
+        if (question == None):
+            try:
+                whenQ = when(const_tree2, nertags)
+                question = whenQ
+            except:
+                continue
+        if (question == None):
+            try:
+                whoQ = who(const_tree3)
+                question = whoQ
+            except:
+                continue
+        if (question == None):
+            try:
+                whatQ = what(sent)
+                question = whatQ
+            except:
+                continue
         if whereQ:
             whereQs.append(whereQ)
             #print(whereQ)
@@ -142,9 +159,10 @@ def getQs(sentences):
         if howQ:
             howQs.append(howQ)
             #print(howQ)
-        if (len(whatQ.split()) > 3): #filter potentially bad qs
-            if not (whereQ or whenQ or whoQ):
-                whatQs.append(whatQ)
+        if whatQ:
+            if (len(whatQ.split()) > 3): #filter potentially bad qs
+                if not (whereQ or whenQ or whoQ):
+                    whatQs.append(whatQ)
     return whereQs, whenQs, whoQs, whyQs, howQs, binQs, whatQs
     
 
@@ -212,7 +230,7 @@ def main(path, n):
     while(len(final_qs) < nquestions):
         final_qs.append('Is this a question?')
     for q in final_qs[0:nquestions]:
-        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')'))
+        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'"))
     parser.close()
 
 if __name__ == "__main__":
