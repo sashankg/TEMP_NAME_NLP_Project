@@ -16,11 +16,6 @@ def vb_past(label):
 #    const_tree = list(parser.raw_parse(s))[0][0]
 #    print(const_tree)
 
-def adjNPs(const_tree):
-    l = [const_tree]
-    while len(l) > 0:
-        tree = l.pop()
-
 def findAdv(const_tree, vp):
     for phr in const_tree: #if on same level
         if phr.label() == 'ADVP' and len(phr) == 1:
@@ -35,10 +30,21 @@ def findAdv(const_tree, vp):
     return None, None
     
 def findBy(const_tree, vbphr):
-    for phr in const_tree: #if by is before subject
-        if phr.label() == 'PP' and leftmost(phr)[0] == 'by':
-            const_tree.remove(phr)
-            return const_tree, phr
+    for phrase in const_tree:
+        if phrase.label() == 'PP' and leftmost(phrase)[0] in ['by','By']:
+            for phr in phrase:
+                if phr.label() == 'NP': #if NP before VP, then is location by  
+                    if leftmost(phr).label() == 'VBG':     
+                        const_tree.remove(phrase)
+                        return const_tree, phrase
+                    else:
+                        return None, None
+                if phr.label() == 'VP':
+                    const_tree.remove(phrase)
+                    return const_tree, phrase
+                if phr.label() == 'S' and phr[0].label() == 'VP':
+                    const_tree.remove(phrase)
+                    return const_tree, phrase
     #if by is within VP, also remove confusing adv
     if vbphr:
         for phr in vbphr:
@@ -46,10 +52,21 @@ def findBy(const_tree, vbphr):
             if phr.label() == 'ADVP' and len(phr) == 1:
                 vbphr.remove(phr)
     if vbphr:
-        for phr in vbphr:
-            if phr.label() == 'PP' and leftmost(phr)[0] == 'by':          
-                vbphr.remove(phr)
-                return const_tree, phr
+        for phrase in vbphr:
+            if phrase.label() == 'PP' and leftmost(phrase)[0] == 'by':
+                for phr in phrase:
+                    if phr.label() == 'NP': #if NP before VP, then is location by
+                        if leftmost(phr).label() == 'VBG':
+                            vbphr.remove(phrase)
+                            return const_tree, phrase
+                        else:
+                            return None, None
+                    if phr.label() == 'VP':
+                        vbphr.remove(phrase)
+                        return const_tree, phrase
+                    if phr.label() == 'S' and phr[0].label() == 'VP':
+                        vbphr.remove(phrase)
+                        return const_tree, phrase
     return None, None
 
 def is_how(const_tree):
@@ -72,6 +89,8 @@ def is_how(const_tree):
 #generate how question
 def how(const_tree):
     res = is_how(const_tree)
+    if len(const_tree) > 0 and hasattr(const_tree[0], 'label') and const_tree[0].label() == ',':
+        const_tree.remove(const_tree[0])
     if not (res == (None, None)):
       q = getBinQ(res[0])
       if q != None:
