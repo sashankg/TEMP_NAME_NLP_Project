@@ -4,6 +4,7 @@ import sys
 from BinQ import getVP, getBinQ, leftmost, getDoForm, getNP
 from LocTime import searchPhrase, searchAndRem
 
+
 def is_howmany(const_tree, nertags):
 	numtags = ["NUMBER", "CARDINAL"]
 	np = getNP(const_tree, len(const_tree))

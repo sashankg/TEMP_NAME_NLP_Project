@@ -73,6 +73,7 @@ def getQs(sentences):
     spacy_nlp = spacy.load('en')
     stop = ['bibliography', 'references', 'see also']
     #parser.tagtype = 'ner'
+    i = 0
     for sent in sentences:
         question = None
         if sent.strip(' ').lower() in stop:
@@ -87,42 +88,49 @@ def getQs(sentences):
             const_tree7 = const_tree1.copy(deep=True)
         except:
             continue
+        try:
+            nertags = parser.ner(sent)
+        except:
+            nertags = []
+            s1 = spacy_nlp(sent) 
+            for w in s1:
+                nertags.append((str(w), w.ent_type_))
         if (question == None):
             try:
                 whyQ = why(const_tree4)
                 question = whyQ
             except:
-                continue
+                pass
         if (question == None):
             try:
                 howQ = how(const_tree5)
                 question = howQ
             except:
-                continue
+                pass
         if (question == None):
             try:
                 howmanyQ = howmany(const_tree7, nertags)
                 question = howmanyQ
             except:
-                continue
+                pass
         if (question == None):
             try:
                 whereQ = where(const_tree1, nertags)
                 question = whereQ
             except:
-                continue
+                pass
         if (question == None):
             try:
                 whenQ = when(const_tree2, nertags)
                 question = whenQ
             except:
-                continue
+                pass
         if (question == None):
             try:
                 whoQ = who(const_tree3)
                 question = whoQ
             except:
-                continue
+                pass
         if (question == None):
             if (const_tree6[0][0]):
                 binQ = getBinQ(const_tree6)
@@ -135,7 +143,7 @@ def getQs(sentences):
                 whatQ = what(sent)
                 question = whatQ
             except:
-                continue
+                pass
         if whereQ:
             whereQs.append(whereQ)
             #print(whereQ)
