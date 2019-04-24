@@ -77,7 +77,7 @@ def getBinQ(const_tree):
     #vblem = lem(u''+verb, u'VERB')[0]
     verb = leftmost(verbphr)
     vblem = lemVerb(verbphr, lem)
-    if verbphr[0].label() == 'MD' or vblem == u'be':
+    if verbphr[0].label() == 'MD' or vblem == u'be' or (len(verbphr) > 1 and verbphr[1].label() == 'VP'):
         ques = ''
         for n in verbphr[1:]:
             ques += ' ' + ' '.join(n.leaves())
@@ -101,4 +101,3 @@ def getBinQ(const_tree):
             beg += ' ' + ' '.join(n.leaves())
         ques = doform + beg + ques + '?'
         return (ques)
-
