@@ -44,18 +44,14 @@ def main(questions, matches):
 			const_tree7 = const_tree1.copy(deep=True)
 		except Exception as e:
 			continue
-		nertags = []
-		s1 = spacy_nlp(sent) 
-		for w in s1:
-			nertags.append((str(w), w.ent_type_))
-		'''try:
+		try:
 			nertags = parser.ner(sent)
 		except Exception as e:
 			print(e)
 			nertags = []
 			s1 = spacy_nlp(sent) 
 			for w in s1:
-				nertags.append((str(w), w.ent_type_))'''
+				nertags.append((str(w), w.ent_type_))
 		(t1, whereA) = is_where(const_tree1, nertags, True)
 		if (keyword_lower == "where" and whereA != None): 
 			print(cap(rem_parens(whereA)))
