@@ -18,7 +18,7 @@ parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 def rem_parens(sent):
-	return sent.replace('-LRB- ', '(').replace(' -RRB-', ')')
+	return sent.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'")
 
 def cap(sent):
 	return sent[0].upper() + sent[1:]
@@ -48,23 +48,23 @@ def main(questions, matches):
 			for w in s1:
 				nertags.append((str(w), w.ent_type_))
 		(t1, whereA) = is_where(const_tree1, nertags, True)
-		if (keyword == "Where" and whereA != None): 
+		if (keyword_lower == "where" and whereA != None): 
 			print(cap(rem_parens(whereA)))
 			continue
 		(t2, whenA) = is_time(const_tree2, nertags, True)
-		if (keyword == "When" and whenA != None):
+		if (keyword_lower == "when" and whenA != None):
 			print(cap(rem_parens(whenA)))
 			continue
 		whoA = is_who(const_tree3)
-		if (keyword == "Who" and whoA != None):
+		if (keyword_lower == "who" and whoA != None):
 			print(cap(rem_parens(whoA)))
 			continue
 		(t5, howA) = is_how(const_tree5)
-		if (keyword == "How" and howA != None):
+		if (keyword_lower == "how" and howA != None):
 			print(cap(rem_parens(howA)))
 			continue
 		(t4, whyA) = reason_cause(const_tree4)
-		if (keyword == "Why" and whyA != None):
+		if (keyword_lower == "why" and whyA != None):
 			print(cap(rem_parens(whyA)))
 			continue
 		if (keywordpos == "MD" or lem(u''+keyword_lower, u'VERB')[0] == "do" or lem(u''+keyword_lower, u'VERB')[0] == "is" or lem(u''+keyword_lower, u'VERB')[0] == "be"):
