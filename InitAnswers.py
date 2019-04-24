@@ -5,6 +5,7 @@ from nltk.tree import Tree
 from WhyHow import is_how, reason_cause
 from Who import is_who
 from LocTime import is_where, is_time 
+from HowMany import is_howmany
 from BinQ import getBinQ
 import What
 import spacy
@@ -28,6 +29,8 @@ def main(questions, matches):
 	for i in range(len(matches)):
 		keyword = questions[i].split(" ")[0]
 		keyword_lower = keyword[0].lower() + keyword[1:]
+		keyword1 = questions[i].split(" ")[1]
+		keyword1_lower = keyword1[0].lower() + keyword1[1:]
 		#parser.tagtype = 'pos'
 		[(w, keywordpos)] = parser.pos_tag(keyword)
 		sent = matches[i]
@@ -38,15 +41,21 @@ def main(questions, matches):
 			const_tree4 = const_tree1.copy(deep=True)
 			const_tree5 = const_tree1.copy(deep=True)
 			const_tree6 = const_tree1.copy(deep=True)
+			const_tree7 = const_tree1.copy(deep=True)
 		except Exception as e:
-                    continue
-		try:
+			continue
+		nertags = []
+		s1 = spacy_nlp(sent) 
+		for w in s1:
+			nertags.append((str(w), w.ent_type_))
+		'''try:
 			nertags = parser.ner(sent)
-		except:
+		except Exception as e:
+			print(e)
 			nertags = []
 			s1 = spacy_nlp(sent) 
 			for w in s1:
-				nertags.append((str(w), w.ent_type_))
+				nertags.append((str(w), w.ent_type_))'''
 		(t1, whereA) = is_where(const_tree1, nertags, True)
 		if (keyword_lower == "where" and whereA != None): 
 			print(cap(rem_parens(whereA)))
@@ -60,8 +69,12 @@ def main(questions, matches):
 			print(cap(rem_parens(whoA)))
 			continue
 		(t5, howA) = is_how(const_tree5)
-		if (keyword_lower == "how" and howA != None):
-			print(cap(rem_parens(howA)))
+		(t7, howmanyA) = is_howmany(const_tree7, nertags)
+		if (keyword_lower == "how"):
+			if (keyword1_lower == "many" and howmanyA != None):
+				print(cap(rem_parens(howmanyA)))
+			elif (howA != None):
+				print(cap(rem_parens(howA)))
 			continue
 		(t4, whyA) = reason_cause(const_tree4)
 		if (keyword_lower == "why" and whyA != None):
