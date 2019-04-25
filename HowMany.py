@@ -33,7 +33,12 @@ def is_howmany(const_tree, nertags):
 					doform = getDoForm(vp[0])[0].lower() + getDoForm(vp[0])[1:]
 					q_body = ' '.join(' '.join(np.leaves()).split())
 					q_body_lower = q_body[0].lower() + q_body[1:]
-					ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have?'
+					if preps:
+						p_str = ' '.join(preps_lst)
+						p_str_lower = p_str[0].lower() + p_str[1:]
+						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have' + ' ' + p_str_lower + '?'
+					else:
+						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have?'
 					return ques, subnp[0]
 		if (len(preps_lst) > 0):
 			for n in nertags:

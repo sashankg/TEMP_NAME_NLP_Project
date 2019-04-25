@@ -104,12 +104,6 @@ def getQs(sentences):
                 continue
         if (question == None):
             try:
-                howmanyQ = howmany(const_tree7, nertags)
-                question = howmanyQ
-            except:
-                continue
-        if (question == None):
-            try:
                 whereQ = where(const_tree1, nertags)
                 question = whereQ
             except:
@@ -124,6 +118,12 @@ def getQs(sentences):
             try:
                 whoQ = who(const_tree3, nertags)
                 question = whoQ
+            except:
+                continue
+        if (question == None):
+            try:
+                howmanyQ = howmany(const_tree7, nertags)
+                question = howmanyQ
             except:
                 continue
         if (question == None):

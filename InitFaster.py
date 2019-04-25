@@ -87,13 +87,17 @@ def getQs(sentences):
             const_tree7 = const_tree1.copy(deep=True)
         except:
             continue
-        try:
+        nertags = []
+        s1 = spacy_nlp(sent) 
+        for w in s1:
+            nertags.append((str(w), w.ent_type_))
+        '''try:
             nertags = parser.ner(sent)
         except:
             nertags = []
             s1 = spacy_nlp(sent) 
             for w in s1:
-                nertags.append((str(w), w.ent_type_))
+                nertags.append((str(w), w.ent_type_))'''
         if (question == None):
             try:
                 whyQ = why(const_tree4)
@@ -104,12 +108,6 @@ def getQs(sentences):
             try:
                 howQ = how(const_tree5)
                 question = howQ
-            except:
-                pass
-        if (question == None):
-            try:
-                howmanyQ = howmany(const_tree7, nertags)
-                question = howmanyQ
             except:
                 pass
         if (question == None):
@@ -128,6 +126,12 @@ def getQs(sentences):
             try:
                 whoQ = who(const_tree3, nertags)
                 question = whoQ
+            except:
+                pass
+        if (question == None):
+            try:
+                howmanyQ = howmany(const_tree7, nertags)
+                question = howmanyQ
             except:
                 pass
         if (question == None):
