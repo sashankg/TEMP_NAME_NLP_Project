@@ -55,10 +55,10 @@ def connect_conj(chunk):
 def get_prep(prep):
     fin = prep.text.lower()
     prep = prep.nbor(1)
-    while(prep.dep_ not in ["pobj", "dobj", "attr", "punct"]):
+    while(prep.dep_ not in ["pobj", "dobj", "attr", "punct", "cconj"]):
         fin += " " + prep.text
         prep = prep.nbor(1)
-    if(prep.dep != "punct"):
+    if(prep.dep_ != "punct"):
         fin += " " + prep.text
     return fin
 
@@ -67,6 +67,8 @@ def get_base(token):
     if token.text in keep:
         return token.text
     return lemmatizer(token.text, token.pos_)[0]
+
+auxs = ["were", "was", "has", "have"]
 
 def what(sent):
     doc = nlp(sent)
@@ -79,10 +81,11 @@ def what(sent):
     obj = ""
     past = False
     lefts = []
+    neg = ""
 
     for token in doc:
         if token.dep_ == "ROOT":
-            head = get_base(token)
+            head = token
             try:
                 if token.nbor(1).dep_ == "prep":
                     head += (" " + token.nbor(1).text)
@@ -96,7 +99,7 @@ def what(sent):
             lefts= [t.text for t in token.lefts]
             for child in token.lefts:
                 if child.dep_ == "neg":
-                    head = child.text + " " + head
+                    neg = child.text
                 if child.pos_ == "VERB" and (child.dep_ in ["aux", "auxpass"]):
                     aux.append(child.text);
                 if child.dep_ == "prep":
@@ -123,28 +126,49 @@ def what(sent):
             and chunk.root.text != "it" and chunk.root.text in lefts):
             chunk_text = connect_conj(chunk)
 
-    if head in ["is", "was", "are"] and chunk_text != "":
-        final_question = "What "+head+" "+chunk_text.strip()
+    if head.text in ["is", "was", "are"] and chunk_text != "":
+        final_question = "What "+head.text+" "+chunk_text.strip()
         if xcomp:
             final_question += (" " + xcomp)
         final_question += "?"
 
     else:
         final_question = ""
-        if(head != "" and chunk_text != ""):
+        if(head.text != "" and chunk_text != ""):
             final_question = "What "
             if len(aux) == 1:
                 final_question += (aux[0] + " ")
-                final_question += (chunk_text.strip() + " " + head)
+                if(aux[0] in auxs):
+                    if neg:
+                        final_question += (chunk_text.strip() + " " + neg + " " + (head.text))
+                    else:
+                        final_question += (chunk_text.strip() + " " + (head.text))
+                else:
+                    if neg:
+                        final_question += (chunk_text.strip() + " " + neg + " " + get_base(head))
+                    else:
+                        final_question += (chunk_text.strip() + " " + get_base(head))
             elif len(aux) == 2:
                 final_question += (aux[0] + " ")
-                final_question += (chunk_text.strip() + " " + aux[1] + " " + head)
+                if(aux[0] in auxs):
+                    if neg:
+                        final_question += (chunk_text.strip() + " " + aux[1] + " " + neg + " " + (head.text))
+                    else:
+                        final_question += (chunk_text.strip() + " " + aux[1] + " " + (head.text))
+                else:
+                    if neg:
+                        final_question += (chunk_text.strip() + " " + aux[1] + " " +  neg + " " + get_base(head))
+                    else:
+                        final_question += (chunk_text.strip() + " " + aux[1] + " " + get_base(head))
             else:
                 if past:
                     final_question += ("did ")
                 else:
                     final_question += ("do ")
-                final_question += (chunk_text.strip() + " " + head)
+                if(neg):
+                    final_question += (chunk_text.strip() + " " + neg + " " + get_base(head))
+                else:
+                    final_question += (chunk_text.strip() + " " +get_base(head))
             if obj:
                 final_question += (" " + obj)
             if agent:
@@ -161,7 +185,7 @@ def what(sent):
 
 """
 def main():
-    sents = getSentences("./training_data/set2/a3.txt")
+    sents = getSentences("./training_data/set1/a1.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
