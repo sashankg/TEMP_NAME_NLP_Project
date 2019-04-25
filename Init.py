@@ -216,6 +216,6 @@ def main(path, n):
     parser.close()
 
 if __name__ == "__main__":
-    #main(sys.argv[1], int(sys.argv[2]))
-    for i in range(int(sys.argv[2])):
-        print("Who is Cleopatra?")
+    main(sys.argv[1], int(sys.argv[2]))
+    #for i in range(int(sys.argv[2])):
+    #    print("Who is Cleopatra?")
