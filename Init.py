@@ -85,17 +85,13 @@ def getQs(sentences):
             const_tree7 = const_tree1.copy(deep=True)
         except:
             continue
-        nertags = []
-        s1 = spacy_nlp(sent) 
-        for w in s1:
-            nertags.append((str(w), w.ent_type_))
-        '''try:
+        try:
             nertags = parser.ner(sent)
         except:
             nertags = []
             s1 = spacy_nlp(sent) 
             for w in s1:
-                nertags.append((str(w), w.ent_type_))'''
+                nertags.append((str(w), w.ent_type_))
         if (question == None):
             if (const_tree6[0][0]):
                 binQ = getBinQ(const_tree6)
