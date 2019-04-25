@@ -1,8 +1,12 @@
 import nltk
 import spacy
 import sys
-from BinQ import getVP, getBinQ, leftmost, getDoForm, getNP
+from BinQ import getVP, getBinQ, leftmost, getDoForm, getNP, lemVerb, lem
 from LocTime import searchPhrase, searchAndRem
+from spacy.lemmatizer import Lemmatizer
+from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
+
+lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 def is_valid(nertags):
 	numtags = ["NUMBER", "CARDINAL"]
@@ -25,6 +29,8 @@ def is_howmany(const_tree, nertags):
 		preps_lst = ' '.join(preps[0].leaves()).split()
 	if vp:
 		subnpTree = searchPhrase(vp, 'NP')
+		verb = ' '.join(' '.join(vp[0].leaves()).split())
+		lem_verb = lem(u''+verb, u'VERB')[0]
 		if len(subnpTree) > 0:
 			subnp = ' '.join(subnpTree[0].leaves()).split()
 			for n in nertags:
@@ -33,12 +39,13 @@ def is_howmany(const_tree, nertags):
 					doform = getDoForm(vp[0])[0].lower() + getDoForm(vp[0])[1:]
 					q_body = ' '.join(' '.join(np.leaves()).split())
 					q_body_lower = q_body[0].lower() + q_body[1:]
-					if preps:
-						p_str = ' '.join(preps_lst)
+					(const_tree3, subpreps) = searchAndRem(vp, 'PP')
+					if subpreps:
+						p_str = ' '.join(' '.join(subpreps[0].leaves()).split())
 						p_str_lower = p_str[0].lower() + p_str[1:]
-						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have' + ' ' + p_str_lower + '?'
+						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' ' + lem_verb + ' ' + p_str_lower + '?'
 					else:
-						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have?'
+						ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' ' + lem_verb + '?'
 					return ques, subnp[0]
 		if (len(preps_lst) > 0):
 			for n in nertags:
@@ -48,7 +55,6 @@ def is_howmany(const_tree, nertags):
 					vp_string = ' '.join(' '.join(vp.leaves()).split())
 					no_prep = vp_string.replace(' '.join(preps_lst), "")
 					rest_preps = ' '.join(preps_lst).replace(n[0], "").replace(preps_lst[0], "")
-					verb = ' '.join(' '.join(vp[0].leaves()).split())
 					no_prep_verb = no_prep.replace(verb, "")
 					try:
 						(prep_tree, det) = searchAndRem(preps, 'DT')
