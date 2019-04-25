@@ -31,7 +31,7 @@ def is_howmany(const_tree, nertags):
 				if (n[1] in numtags and subnp[0] == (n[0])):
 					restnp = (' '.join(subnp)).replace(subnp[0], "")
 					doform = getDoForm(vp[0])[0].lower() + getDoForm(vp[0])[1:]
-					q_body = ' '.join(' '.join(const_tree1[0].leaves()).split())
+					q_body = ' '.join(' '.join(np.leaves()).split())
 					q_body_lower = q_body[0].lower() + q_body[1:]
 					ques = 'How many' + restnp + ' ' + doform + ' ' + q_body_lower + ' have?'
 					return ques, subnp[0]
