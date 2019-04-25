@@ -26,7 +26,7 @@ def insert_lemma(phr, lemma):
 def lemVerb(phr, lemmatizer):
 #lemmatize the head verb of phr
     verb = leftmost(phr)
-    vblem = lemmatizer(u''+verb[0], u'VERB')[0]
+    vblem = lem(u''+verb[0], u'VERB')[0]
     return vblem
 
 def fixcap(phr):

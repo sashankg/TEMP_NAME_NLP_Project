@@ -97,15 +97,13 @@ def matching_sentence(sentences, question):
     return closest_sentence, max_ratio
 
 def finalMatch(clubs, intl, indvl, pfmcs, sentences, question):
-    #find matching career stat question
+    #find matching career stat for question
     club_sent, ratc = matching_stat(clubs, question)
     intl_sent, ratint = matching_stat(intl, question)
     indvl_sent, ratidv = matching_stat(indvl, question)
     pfmcs_sent, ratp = matching_stat(pfmcs, question)
-    close_other, ratio = matching_sentence(sentences, question)
     sents = [club_sent, intl_sent, indvl_sent, pfmcs_sent]
     ques = question.lower()
-    final_ratio = 0
     if 'club' in ques:
         match = club_sent
         final_ratio = ratc
@@ -125,11 +123,10 @@ def finalMatch(clubs, intl, indvl, pfmcs, sentences, question):
         final_ratio = rats[ind]
     #print(match)
     #print(close_other)
-    return match, close_other
+    return match
 
 def answerStats(clubs, intl, indvl, pfmcs, sentences, question):
-    match, close_other = finalMatch(clubs, intl, indvl, pfmcs, sentences, question)
-    quesWords = question.split()
+    match = finalMatch(clubs, intl, indvl, pfmcs, sentences, question)
     if ('What year(s)' in question):
         m = match.split(':')
         if len(m) > 1:
@@ -147,12 +144,32 @@ def answerStats(clubs, intl, indvl, pfmcs, sentences, question):
                 winyrs = winyr[1].split()
                 for w in winyrs:
                     if w != "Runner-up":
-                        word = 'in '
-                        if len(w.split('-')) > 1:
-                            word = 'from '
-                        questions.append("What club honour did " + name + " win " +  word + w.strip(',') + '?')
-                        cnt += 1
-                        break
+                        year = w.split('-')
+                        if len(dashyr) > 0:
+                            year = dashyr[0].strip(',')
+                
+                        
+
+#sentences = ['My mom, who is a nurse, drives a red car.', 'That ladybug, an insect, just landed on the rose bush.', 'I like spaghetti, an Italian dish with noodles and sauce.', 'Mr. Harrison, the principal at my school, wears a tie every day.']#getSentences('./training_data/set4/a3.txt')
+#sentences = ['The bus drove slowly', 'She ran away sneakily by tiptoeing her way out.', 'By copying her friend, she passed the test.']
+clubs, intl, indvl, pfmcs, name, sentences = getSentences('data/set1/a1.txt')
+questions = askCareerStat(clubs, intl, indvl, pfmcs, name)
+print(questions)
+finalMatch(clubs, intl, indvl, pfmcs, sentences, questions[0])
+#print(Tree.fromstring(parser.parse('I live by beautiful houses.'))[0])
+#for sent in sentences:
+#    nertags = parser.ner(sent)
+#    tree = (Tree.fromstring(parser.parse(sent))[0])
+
+parser.close()
+
+##appositive stuff that doesn't work
+"""
+
+
+#works for:
+#    NP(NP, NP)
+#    NP(NP, SBAR(WHNP(WP)(S (VP NP)))), where VP is 'to be'
 
 def leftmost(phr):
     tmp = phr
@@ -175,26 +192,6 @@ def getFirstNP(const_tree):
                         return p
     return None
 
-#sentences = ['My mom, who is a nurse, drives a red car.', 'That ladybug, an insect, just landed on the rose bush.', 'I like spaghetti, an Italian dish with noodles and sauce.', 'Mr. Harrison, the principal at my school, wears a tie every day.']#getSentences('./training_data/set4/a3.txt')
-#sentences = ['The bus drove slowly', 'She ran away sneakily by tiptoeing her way out.', 'By copying her friend, she passed the test.']
-clubs, intl, indvl, pfmcs, name, sentences = getSentences('data/set1/a1.txt')
-questions = askCareerStat(clubs, intl, indvl, pfmcs, name)
-print(questions)
-finalMatch(clubs, intl, indvl, pfmcs, sentences, questions[0])
-#print(Tree.fromstring(parser.parse('I live by beautiful houses.'))[0])
-#for sent in sentences:
-#    nertags = parser.ner(sent)
-#    tree = (Tree.fromstring(parser.parse(sent))[0])
-
-parser.close()
-
-##appositive stuff that doesn't work
-"""
-
-
-#works for:
-#    NP(NP, NP)
-#    NP(NP, SBAR(WHNP(WP)(S (VP NP)))), where VP is 'to be'
 
 def getNounEquiv(const_tree):
     q = [const_tree]
