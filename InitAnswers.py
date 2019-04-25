@@ -63,7 +63,6 @@ def main(questions, matches):
             print(cap(rem_parens(whenA)))
             continue
         whoA = is_who(const_tree3, nertags)
-        print(whoA)
         if (keyword_lower == "who" and whoA != None):
             print(cap(rem_parens(whoA)))
             continue
