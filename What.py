@@ -29,7 +29,7 @@ def getSentences(path):
 """
 
 def is_tense(tag):
-    return tag in ['VBD', 'VBZ', 'VBP', 'VBN']
+    return tag in ['VBD','VBN']
 
 def is_plural(tag):
   return tag.endswith('S')
@@ -39,17 +39,26 @@ def is_verb(tag):
 
 def connect_conj(chunk):
     fin = ""
+    temp = ""
     if(chunk[0].tag_ not in  ["PROPN", "NNS"]):
         fin += chunk[0].text.lower() + " "
     else:
         fin += chunk[0].text + " "
     fin += chunk[1:].text
     conjs = chunk.conjuncts
+    cs = ""
     if(conjs):
         if(len(conjs) > 1):
             for word in conjs[0:len(conjs) - 1]:
                 fin += (", " + word.text)
         fin += (" and " + conjs[len(conjs) - 1].text)
+        cs = conjs[len(conjs) - 1].nbor(1)
+    else:
+        cs = chunk[len(chunk) - 1].nbor(1)
+    if(cs.dep_ == "prep"):
+        temp = get_prep(cs)
+    if(temp != ""):
+        fin += " " + temp
     return fin
 
 def get_prep(prep):
@@ -57,13 +66,15 @@ def get_prep(prep):
     while(prep.dep_ not in ["pobj", "dobj", "attr", "punct"]):
         fin += prep.text.lower() + " "
         prep = prep.nbor(1)
+        if(prep.dep_ in ["nsubj", "nsubjpass"]):
+            break
         if(prep.dep_ in ["pobj", "dobj", "attr", "punct"]):
             if prep.text == "," and prep.nbor(1).dep_ in ["nummod", "appos"]:
                 fin += prep.text + " " + prep.nbor(1).text
             elif prep.nbor(1).dep_ in ["prep", "cc", "nummod", "appos"]:
                 fin += prep.text + " "
                 prep = prep.nbor(1)
-    if(prep.dep_ != "punct"):
+    if(prep.dep_ not in ["punct", "nsubj", "nsubjpass"]):
         fin += prep.text
     return fin.strip()
 
@@ -113,17 +124,20 @@ def what(sent):
 
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
+                    temp = ""
                     for gchild in child.lefts:
                         if gchild.dep_ == "aux":
                             xcomp = gchild.text + " "
                             break
                     for gchild in child.rights:
                         if gchild.dep_ == "prep":
-                            xcomp += gchild.text + " "
+                            temp = gchild.text
                         if gchild.dep_ in ["acomp", "xcomp"]:
                             if(gchild.nbor(-1).dep_ in ["aux", "auxpass"]):
                                 xcomp += gchild.nbor(-1).text + " " + gchild.text + " "
                     xcomp += child.text
+                    if temp != "":
+                        xcomp += " " + gchild.text
                 if child.pos_ == "ADP" and child.dep_ == "agent":
                     agent = child.text
 
@@ -137,7 +151,7 @@ def what(sent):
             chunk_text = connect_conj(chunk)
 
     if head.text in ["is", "was", "are"] and chunk_text != "":
-        final_question = "What "+head.text+" "+chunk_text.strip()
+        final_question = "What "+ head.text + " " +chunk_text.strip()
         if xcomp:
             final_question += (" " + xcomp)
         final_question += "?"
@@ -195,7 +209,7 @@ def what(sent):
 
 """
 def main():
-    sents = getSentences("./training_data/set3/a4.txt")
+    sents = getSentences("./training_data/set5/a1.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
@@ -203,4 +217,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    """
+"""
