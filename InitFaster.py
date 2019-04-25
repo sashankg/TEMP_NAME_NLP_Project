@@ -137,7 +137,6 @@ def getQs(sentences):
                 question = binQ
                 if binQ and len(binQ) < 200:
                     binQs.append(addAnt(binQ, spacy_nlp))
-                    #print(binQ)
         if (question == None):
             try:
                 whatQ = what(sent)
@@ -176,7 +175,7 @@ def main(path, n):
     sentences += getSentences(path)
     nquestions = n
     if len(sentences) <= NUM_PROCESSES * PROCESSOR_RATIO:
-        results = getQs(sentences, nquestions)
+        results = getQs(sentences)
 
     # Otherwise divide workload amongst process threads
     else:
