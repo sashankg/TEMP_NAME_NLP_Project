@@ -23,7 +23,7 @@ def matching_sentence(document, question):
     max_ratio = 0
     closest_sentence = ""
     for s in sentences:
-        r = fuzz.partial_ratio(question, s)
+        r = fuzz.partial_ratio(question.lower(), s.lower())
         if r > max_ratio:
             max_ratio = r
             closest_sentence = s
