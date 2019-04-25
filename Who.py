@@ -4,7 +4,15 @@ import sys
 from BinQ import getVP, getNP, getBinQ, leftmost
 
 def get_who(question, const_tree, nertags):
-    return
+    nphr = getNP(const_tree, len(const_tree))
+    subj = ' '.join(nphr.leaves())
+    if subj.lower() not in question:
+        return subj
+    pos_tags = const_tree.pos()
+    for (w, tag) in pos_tags:
+        if tag[0] == 'N' and w not in question:
+            return w
+
 
 def is_who(const_tree, nertags):
     cpy = const_tree.copy(deep=True)
