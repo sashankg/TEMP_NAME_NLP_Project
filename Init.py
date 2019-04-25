@@ -120,7 +120,7 @@ def getQs(sentences):
                 continue
         if (question == None):
             try:
-                whoQ = who(const_tree3)
+                whoQ = who(const_tree3, nertags)
                 question = whoQ
             except:
                 continue
