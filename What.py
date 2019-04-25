@@ -8,7 +8,7 @@ import sys
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-"""
+
 def readFileLines(path):
     with open(path, 'r') as f:
         return f.readlines()
@@ -26,7 +26,7 @@ def getSentences(path):
             continue
         sentences += [str(sent) for sent in nl(txtline).sents]
     return sentences
-"""
+
 
 def is_tense(tag):
     return tag in ['VBD', 'VBZ', 'VBP', 'VBN']
@@ -79,6 +79,7 @@ def what(sent):
     xcomp = ""
     prep = ""
     obj = ""
+    prep = ""
     past = False
     lefts = []
     neg = ""
@@ -114,12 +115,16 @@ def what(sent):
                     for gchild in child.rights:
                         if gchild.dep_ == "prep":
                             xcomp += gchild.text + " "
+                        if gchild.dep_ in ["acomp", "xcomp"]:
+                            if(gchild.nbor(-1).dep_ in ["aux", "auxpass"]):
+                                xcomp += gchild.nbor(-1).text + " " + gchild.text + " "
                     xcomp += child.text
                 if child.pos_ == "ADP" and child.dep_ == "agent":
                     agent = child.text
-                if child.dep_ == "prep" and not first:
-                    first = False
-                    head += (" " + child.text)
+
+                #if child.dep_ == "prep" and not first:
+                    #first = False
+                    #head += (" " + child.text)
 
     for chunk in doc.noun_chunks:
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
@@ -183,9 +188,9 @@ def what(sent):
 
     return (final_question)
 
-"""
+
 def main():
-    sents = getSentences("./training_data/set1/a1.txt")
+    sents = getSentences("./training_data/a1.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
@@ -193,4 +198,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
