@@ -49,8 +49,19 @@ def is_where(const_tree, nertags, answering):
             #oversimplifying; make more robust
             if nertags[i][1] in locationtags and (nertags[i][0]) == np.split()[0] and i > 0 and (nertags[i-1][0]).lower() != 'of':    
                 return const_tree, ' '.join(p.leaves())
-    if answering and len(preps) > 0: #return some rand non-loc PP as ans
-        return const_tree, ' '.join(preps[0].leaves())
+    
+    if answering:
+        res = ''
+        for n in nertags:
+            if n[1] in locationtags:
+                res += n[0] + ' '
+            if len(res) > 0 and n[1] not in locationtags:
+                break
+        if len(res) > 0:
+            return const_tree, res
+        if len(preps) > 0: #return some rand non-loc PP as ans
+            return const_tree, ' '.join(preps[0].leaves())
+        return None, None
     else:
         return None, None
 
