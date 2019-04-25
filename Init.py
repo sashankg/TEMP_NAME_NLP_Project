@@ -187,7 +187,7 @@ def main(path, n):
     goodHow, b6 = goodQs((howQs))
     goodBi, b7 = goodQs((binQs))
     goodHowMany, b8 = goodQs((howmanyQs))
-    print(whatQs)
+    #print(whatQs)
     bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5, b8] #who, what, where, when, why, how, howmany
     while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) + len(goodHowMany) > 0:
         if len(final_qs) > nquestions:
