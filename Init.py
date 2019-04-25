@@ -212,7 +212,7 @@ def main(path, n):
     while(len(final_qs) < nquestions):
         final_qs.append('Is this a question?')
     for q in final_qs[0:nquestions]:
-        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'").replace(" .", ""))
+        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'").replace(" .", "").replace("  ", " "))
     parser.close()
 
 if __name__ == "__main__":
