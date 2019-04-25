@@ -73,7 +73,6 @@ def getQs(sentences):
     spacy_nlp = spacy.load('en')
     stop = ['bibliography', 'references', 'see also']
     #parser.tagtype = 'ner'
-    i = 0
     for sent in sentences:
         question = None
         if sent.strip(' ').lower() in stop:
@@ -235,7 +234,7 @@ def main(path, n):
     while(len(final_qs) < nquestions):
         final_qs.append('Is this a question?')
     for q in final_qs[0:nquestions]:
-        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'"))
+        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'").replace("  ", " "))
     parser.close()
 
 if __name__ == "__main__":
