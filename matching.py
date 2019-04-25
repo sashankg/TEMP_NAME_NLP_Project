@@ -19,7 +19,7 @@ def main():
 
 
 def matching_sentence(document, question):
-    sentences = getSentences(document)
+    clubs, intl, indvl, pfmcs, name, sentences = getSentences(document)
     max_ratio = 0
     closest_sentence = ""
     for s in sentences:

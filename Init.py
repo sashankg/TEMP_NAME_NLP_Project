@@ -97,6 +97,12 @@ def getQs(sentences):
             for w in s1:
                 nertags.append((str(w), w.ent_type_))'''
         if (question == None):
+            if (const_tree6[0][0]):
+                binQ = getBinQ(const_tree6)
+                if binQ and len(binQ) < 200:
+                    binQs.append(addAnt(binQ, spacy_nlp))
+                    #print(binQ)
+        if (question == None):
             try:
                 whyQ = why(const_tree4)
                 question = whyQ
@@ -132,13 +138,6 @@ def getQs(sentences):
                 question = howmanyQ
             except:
                 continue
-        if (question == None):
-            if (const_tree6[0][0]):
-                binQ = getBinQ(const_tree6)
-                question = binQ
-                if binQ and len(binQ) < 200:
-                    binQs.append(addAnt(binQ, spacy_nlp))
-                    #print(binQ)
         if (question == None):
             try:
                 whatQ = what(sent)

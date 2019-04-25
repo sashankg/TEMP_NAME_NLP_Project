@@ -17,4 +17,4 @@ n_questions = int(sys.argv[2])
 # for q in questions:
 #     print(q)
 
-InitFaster.main(article_filename, n_questions)
+Init.main(article_filename, n_questions)
