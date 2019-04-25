@@ -8,13 +8,14 @@ import sys
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-"""
+
 def readFileLines(path):
     with open(path, 'r') as f:
         return f.readlines()
 def writeFile(path, contents):
     with open(path, 'w') as f:
         f.write(contents)
+
 
 def getSentences(path):
     text = [x.strip() for x in readFileLines(path)]
@@ -26,7 +27,7 @@ def getSentences(path):
             continue
         sentences += [str(sent) for sent in nl(txtline).sents]
     return sentences
-"""
+
 
 def is_tense(tag):
     return tag in ['VBD','VBN']
@@ -40,6 +41,8 @@ def is_verb(tag):
 def connect_conj(chunk):
     fin = ""
     temp = ""
+    if chunk[0].nbor(-1).tag_ in ["npadvmod", "nmod"]:
+        fin = chunk[0].nbor(-1).text + " "
     if(chunk[0].tag_ not in  ["PROPN", "NNS"]):
         fin += chunk[0].text.lower() + " "
     else:
@@ -64,16 +67,36 @@ def connect_conj(chunk):
 def get_prep(prep):
     fin = ""
     while(prep.dep_ not in ["pobj", "dobj", "attr", "punct"]):
+        temp_pre = ""
+        try:
+            temp_pre = prep.nbor(-1)
+        except:
+            pass
+        if temp_pre:
+            if(temp_pre.dep in ["aux", "auxpass", "det"]):
+                fin += prep.nbor(-1).text + " "
         fin += prep.text.lower() + " "
-        prep = prep.nbor(1)
+        temp = [p for p in prep.rights]
+        if(temp != []):
+            prep = temp[0]
+        else:
+            prep = prep.nbor(1)
         if(prep.dep_ in ["nsubj", "nsubjpass"]):
             break
         if(prep.dep_ in ["pobj", "dobj", "attr", "punct"]):
-            if prep.text == "," and prep.nbor(1).dep_ in ["nummod", "appos"]:
-                fin += prep.text + " " + prep.nbor(1).text
-            elif prep.nbor(1).dep_ in ["prep", "cc", "nummod", "appos"]:
+            temp = [p for p in prep.rights]
+            temp_prep = None
+            if(temp != []):
+                temp_prep = temp[0]
+            else:
+                temp_prep = prep.nbor(1)
+            if(prep.nbor(-1).tag_ == "ADJ"):
+                fin += prep.nbor(-1).text
+            if prep.text == "," and temp_prep.dep_ in ["nummod", "appos"]:
+                fin += prep.text + " " + temp_prep.text
+            elif temp_prep.dep_ in ["prep", "cc", "nummod", "appos", "acl"]:
                 fin += prep.text + " "
-                prep = prep.nbor(1)
+                prep = temp_prep
     if(prep.dep_ not in ["punct", "nsubj", "nsubjpass"]):
         fin += prep.text
     return fin.strip()
@@ -84,7 +107,7 @@ def get_base(token):
         return token.text
     return lemmatizer(token.text, token.pos_)[0]
 
-auxs = ["were", "was", "has", "have", "are"]
+auxs = ["were", "was", "has", "have", "are", "would", "could"]
 
 def what(sent):
     doc = nlp(sent)
@@ -96,6 +119,7 @@ def what(sent):
     prep = ""
     obj = ""
     prep = ""
+    prep2 = ""
     past = False
     lefts = []
     neg = ""
@@ -104,10 +128,10 @@ def what(sent):
         if token.dep_ == "ROOT":
             head = token
             try:
-                if token.nbor(1).dep_ == "prep":
-                    head += (" " + token.nbor(1).text)
-                elif token.nbor(1).dep_ in ["dobj", "pobj", "attr"]:
+                if token.nbor(1).dep_ in ["dobj", "pobj"]:
                     obj += token.nbor(1).text
+                    if(token.nbor(2).dep_ == "prep"):
+                        obj += " " + token.nbor(2).text
             except:
                 pass
 
@@ -125,25 +149,29 @@ def what(sent):
             for child in token.rights:
                 if child.dep_ in ["xcomp", "acomp"]:
                     temp = ""
+                    aux_ex = False
                     for gchild in child.lefts:
                         if gchild.dep_ == "aux":
+                            aux_ex = True
                             xcomp = gchild.text + " "
                             break
                     for gchild in child.rights:
-                        if gchild.dep_ == "prep":
-                            temp = gchild.text
                         if gchild.dep_ in ["acomp", "xcomp"]:
                             if(gchild.nbor(-1).dep_ in ["aux", "auxpass"]):
                                 xcomp += gchild.nbor(-1).text + " " + gchild.text + " "
-                    xcomp += child.text
+                    if(aux_ex):
+                        xcomp += "do"
+                    else:
+                        xcomp += child.text
                     if temp != "":
-                        xcomp += " " + gchild.text
+                        xcomp += " " + temp
                 if child.pos_ == "ADP" and child.dep_ == "agent":
+                    first = False
                     agent = child.text
 
-                #if child.dep_ == "prep" and not first:
-                    #first = False
-                    #head += (" " + child.text)
+                if child.dep_ == "prep" and first:
+                    first = False
+                    prep2 = child.text
 
     for chunk in doc.noun_chunks:
         if((chunk.root.dep_ == "nsubj" or chunk.root.dep_ == "nsubjpass")
@@ -187,6 +215,8 @@ def what(sent):
             else:
                 if past:
                     final_question += ("did ")
+                elif not is_plural(head.tag_):
+                    final_question += ("does ")
                 else:
                     final_question += ("do ")
                 if(neg):
@@ -207,9 +237,9 @@ def what(sent):
 
     return (final_question)
 
-"""
+
 def main():
-    sents = getSentences("./training_data/set5/a1.txt")
+    sents = getSentences("./training_data/set2/a6.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
@@ -217,4 +247,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
