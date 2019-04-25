@@ -14,6 +14,7 @@ from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 import sys
 import matching
 from SynAnt import answerBinQ
+from careerstat import getSentences, answerStats
 
 parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 lem = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
@@ -24,8 +25,9 @@ def rem_parens(sent):
 def cap(sent):
 	return sent[0].upper() + sent[1:]
 
-def main(questions, matches):
+def main(questions, matches, path):
     spacy_nlp = spacy.load('en')
+    clubs, intl, indvl, pfmcs, name, sentences = getSentences(path)
     for i in range(len(matches)):
         tokens = nltk.word_tokenize(questions[i])
         if len(tokens) < 2:
@@ -54,6 +56,10 @@ def main(questions, matches):
             s1 = spacy_nlp(sent) 
             for w in s1:
                 nertags.append((str(w), w.ent_type_))
+        statsA = answerStats(clubs, intl, indvl, pfmcs, sentences, questions[i])
+        if statsA:
+            print(statsA)
+            continue
         (t1, whereA) = is_where(const_tree1, nertags, True)
         if (keyword_lower == "where" and whereA != None): 
             print(cap(rem_parens(whereA)))
@@ -82,6 +88,7 @@ def main(questions, matches):
             print(rem_parens(answerBinQ(sent, questions[i], spacy_nlp)))
             continue
         else:
+
             print(rem_parens(sent))
 
 
