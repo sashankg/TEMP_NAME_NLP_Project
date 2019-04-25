@@ -3,7 +3,7 @@ from nltk.parse import CoreNLPParser
 from stanfordcorenlp import StanfordCoreNLP
 from nltk.tree import Tree
 from WhyHow import is_how, reason_cause
-from Who import is_who
+from Who import is_who, get_who
 from LocTime import is_where, is_time 
 from HowMany import is_howmany
 from BinQ import getBinQ
@@ -62,8 +62,7 @@ def main(questions, matches):
         if (keyword_lower == "when" and whenA != None):
             print(cap(rem_parens(whenA)))
             continue
-        whoA = is_who(const_tree3, nertags)
-        print(whoA)
+        whoA = get_who(questions[i].lower(), const_tree3, nertags)
         if (keyword_lower == "who" and whoA != None):
             print(cap(rem_parens(whoA)))
             continue

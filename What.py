@@ -53,14 +53,19 @@ def connect_conj(chunk):
     return fin
 
 def get_prep(prep):
-    fin = prep.text.lower()
-    prep = prep.nbor(1)
-    while(prep.dep_ not in ["pobj", "dobj", "attr", "punct", "cconj"]):
-        fin += " " + prep.text
+    fin = ""
+    while(prep.dep_ not in ["pobj", "dobj", "attr", "punct"]):
+        fin += prep.text.lower() + " "
         prep = prep.nbor(1)
+        if(prep.dep_ in ["pobj", "dobj", "attr", "punct"]):
+            if prep.text == "," and prep.nbor(1).dep_ in ["nummod", "appos"]:
+                fin += prep.text + " " + prep.nbor(1).text
+            elif prep.nbor(1).dep_ in ["prep", "cc", "nummod", "appos"]:
+                fin += prep.text + " "
+                prep = prep.nbor(1)
     if(prep.dep_ != "punct"):
-        fin += " " + prep.text
-    return fin
+        fin += prep.text
+    return fin.strip()
 
 def get_base(token):
     keep = ["is", "was", "are"]
@@ -68,7 +73,7 @@ def get_base(token):
         return token.text
     return lemmatizer(token.text, token.pos_)[0]
 
-auxs = ["were", "was", "has", "have"]
+auxs = ["were", "was", "has", "have", "are"]
 
 def what(sent):
     doc = nlp(sent)
@@ -190,7 +195,7 @@ def what(sent):
 
 """
 def main():
-    sents = getSentences("./training_data/a1.txt")
+    sents = getSentences("./training_data/set3/a4.txt")
     for sent in sents:
         temp = what(sent)
         if temp != None:
@@ -198,4 +203,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
+    """
