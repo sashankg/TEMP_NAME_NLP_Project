@@ -58,18 +58,19 @@ def getQs(sentences):
     howmanyQs = []
     binQs = []
     whatQs = []
-    whereQ = None
-    whenQ = None
-    whoQ = None
-    whyQ = None
-    howQ = None
-    howmanyQ = None
-    binQ = None
-    whatQ = None
+    
     spacy_nlp = spacy.load('en')
     stop = ['bibliography', 'references', 'see also']
     #parser.tagtype = 'ner'
     for sent in sentences:
+        whereQ = None
+        whenQ = None
+        whoQ = None
+        whyQ = None
+        howQ = None
+        howmanyQ = None
+        binQ = None
+        whatQ = None
         question = None
         if sent.strip(' ').lower() in stop:
             break
@@ -186,6 +187,7 @@ def main(path, n):
     goodHow, b6 = goodQs((howQs))
     goodBi, b7 = goodQs((binQs))
     goodHowMany, b8 = goodQs((howmanyQs))
+    print(whatQs)
     bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5, b8] #who, what, where, when, why, how, howmany
     while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) + len(goodHowMany) > 0:
         if len(final_qs) > nquestions:
