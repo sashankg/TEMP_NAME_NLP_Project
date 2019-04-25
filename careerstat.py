@@ -36,6 +36,7 @@ def getSentences(path):
                 i += 1
         if text[i] == 'Individual':
             i += 1
+            justaspace = False
             if i + 1 < numLines and text[i+1] != "":
                 justaspace = True
             while i < numLines and (text[i] != "" or justaspace):
@@ -56,6 +57,13 @@ def askCareerStat(clubs, intl, indvl, pfmcs, name):
     cnt = 0
     if len(indvl) > 0:
         questions.append("What is the first individual honour " + name + ' won?')
+    
+    for c in intl:
+        winyr = c.split(':')
+        if cnt < 3 and len(winyr) > 1:
+            questions.append("What year(s) did " + name + " win the " + winyr[0] + '?')
+            cnt += 1
+    cnt = 0
     for c in clubs: #add at most three of these
         winyr = c.split(':')
         if cnt < 3 and len(winyr) > 1:
@@ -63,17 +71,13 @@ def askCareerStat(clubs, intl, indvl, pfmcs, name):
             for w in winyrs:
                 if w != "Runner-up":
                     word = 'in '
-                    if len(w.split('-')) > 1:
+                    yr = w.strip().strip(',')
+                    if len(yr) > 4:
                         word = 'from '
-                    questions.append("What club honour did " + name + " win " +  word + w.strip(',') + '?')
+                        w = w[:4]
+                    questions.append("What club honour did " + name + " win " +  word + yr + '?')
                     cnt += 1
-                    break
-    cnt = 0
-    for c in intl:
-        winyr = c.split(':')
-        if cnt < 3 and len(winyr) > 1:
-            questions.append("What year(s) did " + name + " win the " + winyr[0] + '?')
-            cnt += 1
+                    break    
     if len(pfmcs) > 0:
         questions.append("What are some of " + name + "'s top performances?")
     return questions
@@ -88,6 +92,7 @@ def matching_stat(honours, question):
             max_ratio = r
             closest_sentence = s
     return closest_sentence, max_ratio
+    
 
 def matching_sentence(sentences, question):
     max_ratio = 0
@@ -135,9 +140,12 @@ def answerStats(clubs, intl, indvl, pfmcs, sentences, question):
         if len(m) > 1:
             return m[1].strip()
     if ('What club honour' in question):
-        m = match.split(':')
-        if len(m) > 1:
-            return m[0]
+        for match in clubs:
+            l = question.strip('?').split()
+            if l[len(l) - 1] in match:
+                m = match.split(':')
+                if len(m) > 1:
+                    return m[0]
     if ('What is the first individual honour' in question):
         minYr = 2020
         firstwin = 'I can\'t find it.'
@@ -161,19 +169,18 @@ def answerStats(clubs, intl, indvl, pfmcs, sentences, question):
             return (pfmcs[0] + ' and ' + pfmcs[1])
                         
 
-#sentences = ['My mom, who is a nurse, drives a red car.', 'That ladybug, an insect, just landed on the rose bush.', 'I like spaghetti, an Italian dish with noodles and sauce.', 'Mr. Harrison, the principal at my school, wears a tie every day.']#getSentences('./training_data/set4/a3.txt')
-#sentences = ['The bus drove slowly', 'She ran away sneakily by tiptoeing her way out.', 'By copying her friend, she passed the test.']
-clubs, intl, indvl, pfmcs, name, sentences = getSentences('data/set1/a1.txt')
+"""clubs, intl, indvl, pfmcs, name, sentences = getSentences('data/set1/a8.txt')
 questions = askCareerStat(clubs, intl, indvl, pfmcs, name)
 for q in questions:
     print(q)
-    print(answerStats(clubs, intl, indvl, pfmcs, sentences, q))
-#print(Tree.fromstring(parser.parse('I live by beautiful houses.'))[0])
-#for sent in sentences:
-#    nertags = parser.ner(sent)
-#    tree = (Tree.fromstring(parser.parse(sent))[0])
-
-parser.close()
+    print(answerStats(clubs, intl, indvl, pfmcs, sentences, q))"""
+"""from LocTime import where
+for sent in sentences:
+    nertags = parser.ner(sent)
+    tree = (Tree.fromstring(parser.parse(sent))[0])
+    whereQ = (where(tree, nertags))
+    print(whereQ)
+parser.close()"""
 
 ##appositive stuff that doesn't work
 """

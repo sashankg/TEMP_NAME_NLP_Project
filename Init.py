@@ -13,6 +13,7 @@ from spacy.lemmatizer import Lemmatizer
 from spacy.lang.en import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES, English
 from What import what
 from SynAnt import addAnt
+from careerstat import getSentences, askCareerStat
 
 parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 
@@ -25,7 +26,7 @@ def writeFile(path, contents):
     with open(path, 'w') as f:
         f.write(contents)
 
-def getSentences(path):
+'''def getSentences(path):
     text = [x.strip() for x in readFileLines(path)]
     nlp = English()
     nlp.add_pipe(nlp.create_pipe('sentencizer'))
@@ -34,7 +35,7 @@ def getSentences(path):
         if len(txtline) < 30:
             continue
         sentences += [str(sent) for sent in nlp(txtline).sents]
-    return sentences
+    return sentences'''
 
 def goodQs(l): #filter q by len
     if not l:
@@ -84,13 +85,17 @@ def getQs(sentences):
             const_tree7 = const_tree1.copy(deep=True)
         except:
             continue
-        try:
+        nertags = []
+        s1 = spacy_nlp(sent) 
+        for w in s1:
+            nertags.append((str(w), w.ent_type_))
+        '''try:
             nertags = parser.ner(sent)
         except:
             nertags = []
             s1 = spacy_nlp(sent) 
             for w in s1:
-                nertags.append((str(w), w.ent_type_))
+                nertags.append((str(w), w.ent_type_))'''
         if (question == None):
             try:
                 whyQ = why(const_tree4)
@@ -165,7 +170,8 @@ def getQs(sentences):
 
 def main(path, n):
     sentences = []
-    sentences += getSentences(path)
+    clubs, intl, indvl, pfmcs, name, sentences = getSentences(path)
+    #sentences += getSentences(path)
     nquestions = n
     whereQs = []
     whenQs = []
@@ -175,9 +181,11 @@ def main(path, n):
     howmanyQs = []
     binQs = []
     whatQs = []
+    statQs = []
     spacy_nlp = spacy.load('en')
     stop = ['Bibliography', 'References', 'See also']
     (whereQs, whenQs, whoQs, whyQs, howQs, howmanyQs, binQs, whatQs) = getQs(sentences)
+    goodStats = askCareerStat(clubs, intl, indvl, pfmcs, name)
     final_qs = []
     goodWho, b1 = goodQs((whoQs))
     goodWhere, b2 = goodQs((whereQs))
@@ -189,7 +197,7 @@ def main(path, n):
     goodHowMany, b8 = goodQs((howmanyQs))
     #print(whatQs)
     bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5, b8] #who, what, where, when, why, how, howmany
-    while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) + len(goodHowMany) > 0:
+    while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) + len(goodHowMany) + len(goodStats)> 0:
         if len(final_qs) > nquestions:
             break
         if goodWho:
@@ -208,6 +216,8 @@ def main(path, n):
             final_qs.append(goodHowMany.pop(0))
         if goodBi:
             final_qs.append(goodBi.pop(0))
+        if goodStats:
+            final_qs.append(goodStats.pop(0))
     for b in bads:
         if len(final_qs) < nquestions:
             final_qs += b
