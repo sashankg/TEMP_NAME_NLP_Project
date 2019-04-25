@@ -6,6 +6,7 @@ from BinQ import getBinQ
 from LocTime import where, when
 from Who import who
 from WhyHow import why, how
+from HowMany import howmany
 import sys
 import spacy
 from spacy.lemmatizer import Lemmatizer
@@ -54,6 +55,7 @@ def getQs(sentences):
     whoQs = []
     whyQs = []
     howQs = []
+    howmanyQs = []
     binQs = []
     whatQs = []
     whereQ = None
@@ -61,6 +63,7 @@ def getQs(sentences):
     whoQ = None
     whyQ = None
     howQ = None
+    howmanyQ = None
     binQ = None
     whatQ = None
     spacy_nlp = spacy.load('en')
@@ -77,8 +80,8 @@ def getQs(sentences):
             const_tree4 = const_tree1.copy(deep=True)
             const_tree5 = const_tree1.copy(deep=True)
             const_tree6 = const_tree1.copy(deep=True)
+            const_tree7 = const_tree1.copy(deep=True)
         except:
-            #print('Exception at: ' + str(sent))
             continue
         try:
             nertags = parser.ner(sent)
@@ -100,12 +103,11 @@ def getQs(sentences):
             except:
                 continue
         if (question == None):
-            if (const_tree6[0][0]):
-                binQ = getBinQ(const_tree6)
-                question = binQ
-                if binQ and len(binQ) < 200:
-                    binQs.append(addAnt(binQ, spacy_nlp))
-                    #print(binQ)
+            try:
+                howmanyQ = howmany(const_tree7, nertags)
+                question = howmanyQ
+            except:
+                continue
         if (question == None):
             try:
                 whereQ = where(const_tree1, nertags)
@@ -124,6 +126,13 @@ def getQs(sentences):
                 question = whoQ
             except:
                 continue
+        if (question == None):
+            if (const_tree6[0][0]):
+                binQ = getBinQ(const_tree6)
+                question = binQ
+                if binQ and len(binQ) < 200:
+                    binQs.append(addAnt(binQ, spacy_nlp))
+                    #print(binQ)
         if (question == None):
             try:
                 whatQ = what(sent)
@@ -145,11 +154,13 @@ def getQs(sentences):
         if howQ:
             howQs.append(howQ)
             #print(howQ)
+        if howmanyQ:
+            howmanyQs.append(howmanyQ)
         if whatQ:
             if (len(whatQ.split()) > 3): #filter potentially bad qs
                 if not (whereQ or whenQ or whoQ):
                     whatQs.append(whatQ)
-    return whereQs, whenQs, whoQs, whyQs, howQs, binQs, whatQs
+    return whereQs, whenQs, whoQs, whyQs, howQs, howmanyQs, binQs, whatQs
 
 def main(path, n):
     sentences = []
@@ -160,11 +171,12 @@ def main(path, n):
     whoQs = []
     whyQs = []
     howQs = []
+    howmanyQs = []
     binQs = []
     whatQs = []
     spacy_nlp = spacy.load('en')
     stop = ['Bibliography', 'References', 'See also']
-    (whereQs, whenQs, whoQs, whyQs, howQs, binQs, whatQs) = getQs(sentences)
+    (whereQs, whenQs, whoQs, whyQs, howQs, howmanyQs, binQs, whatQs) = getQs(sentences)
     final_qs = []
     goodWho, b1 = goodQs((whoQs))
     goodWhere, b2 = goodQs((whereQs))
@@ -173,8 +185,9 @@ def main(path, n):
     goodWhat, b5 = goodQs((whatQs))
     goodHow, b6 = goodQs((howQs))
     goodBi, b7 = goodQs((binQs))
-    bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5] #who, what, where, when, why, how
-    while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) > 0:
+    goodHowMany, b8 = goodQs((howmanyQs))
+    bads = [goodBi, goodWhat, b1, b2, b3, b4, b6, b7, b5, b8] #who, what, where, when, why, how, howmany
+    while len(goodWho) + len(goodWhere) + len(goodWhen) + len(goodWhy) +len(goodHow) + len(goodHowMany) > 0:
         if len(final_qs) > nquestions:
             break
         if goodWho:
@@ -189,6 +202,8 @@ def main(path, n):
             final_qs.append(goodWhat.pop(0))
         if goodHow:
             final_qs.append(goodHow.pop(0))
+        if goodHowMany:
+            final_qs.append(goodHowMany.pop(0))
         if goodBi:
             final_qs.append(goodBi.pop(0))
     for b in bads:
@@ -197,7 +212,7 @@ def main(path, n):
     while(len(final_qs) < nquestions):
         final_qs.append('Is this a question?')
     for q in final_qs[0:nquestions]:
-        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'"))
+        print(q.replace('-LRB- ', '(').replace(' -RRB-', ')').replace(" ,", ",").replace( " '", "'").replace(" .", ""))
     parser.close()
 
 if __name__ == "__main__":
