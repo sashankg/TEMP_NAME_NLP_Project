@@ -8,7 +8,7 @@ import sys
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-"""
+
 def readFileLines(path):
     with open(path, 'r') as f:
         return f.readlines()
@@ -27,7 +27,7 @@ def getSentences(path):
             continue
         sentences += [str(sent) for sent in nl(txtline).sents]
     return sentences
-"""
+
 
 def is_tense(tag):
     return tag in ['VBD','VBN']
@@ -93,7 +93,7 @@ def get_prep(prep):
                 temp_prep = prep.nbor(1)
             except:
                 pass
-            if(not (test_prep == None)):
+            if(not (temp_prep == None)):
                 if prep.text == "," and temp_prep.dep_ in ["nummod", "appos"]:
                     fin += prep.text + " " + temp_prep.text
                 elif temp_prep.dep_ in ["prep", "cc", "nummod", "appos", "acl"]:
@@ -243,7 +243,7 @@ def what(sent):
 
     return (final_question)
 
-"""
+
 def main():
     for i in range(1, 6):
         for j in range(1, 11):
@@ -255,4 +255,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
