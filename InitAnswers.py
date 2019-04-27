@@ -31,7 +31,7 @@ def main(questions, matches, path):
     for i in range(len(matches)):
         tokens = nltk.word_tokenize(questions[i])
         if len(tokens) < 2:
-            print("this is an answer")
+            print(matches[i])
             continue
         keyword = tokens[0]
         keyword_lower = keyword[0].lower() + keyword[1:]
@@ -41,7 +41,7 @@ def main(questions, matches, path):
         try:
             [(w, keywordpos)] = parser.pos_tag(keyword)
         except:
-            print("this is an answer")
+            print(matches[i])
             continue
         sent = matches[i]
         try:
@@ -53,7 +53,7 @@ def main(questions, matches, path):
             const_tree6 = const_tree1.copy(deep=True)
             const_tree7 = const_tree1.copy(deep=True)
         except Exception as e:
-            print("this is an answer")
+            print(matches[i])
             continue
         try:
             nertags = parser.ner(sent)
