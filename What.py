@@ -8,7 +8,7 @@ import sys
 nlp = spacy.load("en")
 lemmatizer = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-"""
+
 def readFileLines(path):
     with open(path, 'r') as f:
         return f.readlines()
@@ -27,7 +27,7 @@ def getSentences(path):
             continue
         sentences += [str(sent) for sent in nl(txtline).sents]
     return sentences
-"""
+
 
 def is_tense(tag):
     return tag in ['VBD','VBN']
@@ -89,13 +89,16 @@ def get_prep(prep):
             temp_prep = None
             if(temp != []):
                 temp_prep = temp[0]
-            else:
+            try:
                 temp_prep = prep.nbor(1)
-            if prep.text == "," and temp_prep.dep_ in ["nummod", "appos"]:
-                fin += prep.text + " " + temp_prep.text
-            elif temp_prep.dep_ in ["prep", "cc", "nummod", "appos", "acl"]:
-                fin += prep.text + " "
-                prep = temp_prep
+            except:
+                pass
+            if(not (test_prep == None)):
+                if prep.text == "," and temp_prep.dep_ in ["nummod", "appos"]:
+                    fin += prep.text + " " + temp_prep.text
+                elif temp_prep.dep_ in ["prep", "cc", "nummod", "appos", "acl"]:
+                    fin += prep.text + " "
+                    prep = temp_prep
     if(prep.dep_ not in ["punct", "nsubj", "nsubjpass"]):
         fin += prep.text
     return fin.strip()
@@ -240,14 +243,14 @@ def what(sent):
 
     return (final_question)
 
-"""
 def main():
-    sents = getSentences("./training_data/set1/a2.txt")
-    for sent in sents:
-        temp = what(sent)
-        if temp != None:
-            print(what(sent))
+    for i in range(1, 6):
+        for j in range(1, 11):
+            sents = getSentences("./training_data/set"+str(i) + "/a" + str(j) + ".txt")
+            for sent in sents:
+                temp = what(sent)
+                if temp != None:
+                    print(what(sent))
 
 if __name__ == "__main__":
     main()
-"""
