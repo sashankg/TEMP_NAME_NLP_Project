@@ -7,7 +7,7 @@ from BinQ import getBinQ
 from fuzzywuzzy import fuzz
 
 
-parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
+#parser = StanfordCoreNLP(r'stanford-corenlp-full-2018-02-27')
 
 def readFileLines(path):
     with open(path, 'r', encoding='utf-8') as f:

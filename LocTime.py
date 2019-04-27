@@ -19,6 +19,7 @@ def searchPhrase(const_tree, phraseType):
             if subtree.label() == phraseType:
                 phrases.append(subtree)
     return phrases
+
 def searchAndRem(const_tree, phraseType):
     phrases = []
     q = [const_tree]
